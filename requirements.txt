@@ -1,3 +1,5 @@
 selenium
 click
 pyyaml
+PyPyDispatcher
+sentry-sdk

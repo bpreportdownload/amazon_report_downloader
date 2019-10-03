@@ -47,6 +47,7 @@ ENV/
 *.ini
 !tox.ini
 *.yml
+!examples/configs/*.yml
 *.txt
 !requirements.txt
 !requirements-dev.txt

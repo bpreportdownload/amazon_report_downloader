@@ -1,0 +1,4 @@
+include requirements.txt
+include README.md
+include amazon_management/VERSION
+graft amazon_management/bin

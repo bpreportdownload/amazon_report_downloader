@@ -3,9 +3,23 @@ import sys
 from sys import platform
 import logging
 
+from pydispatch import dispatcher
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 
+import sentry_sdk
+from sentry_sdk import capture_message
+
+from amazon_management.signals import (
+    get_shipping_fee_failure,
+    pick_marketplace_failure,
+    choose_template_failure,
+    change_shipping_price_failure,
+    trigger_report_request_failure,
+    generate_report_failure
+)
+
+sentry_sdk.init("https://d51046fa20ba4b889f373384feea075e@sentry.io/1544767")
 
 MARKETPLACE_MAPPING = {
     'us': {
@@ -58,6 +72,14 @@ MARKETPLACE_MAPPING = {
     }
 }
 
+SHIPPING_TEMPLATE_MAPPING = {
+    'us': 'https://sellercentral.amazon.com/sbr/ref=xx_shipset_dnav_xx#shipping_templates',
+    'uk': 'https://sellercentral.amazon.co.uk/sbr/ref=xx_shipset_dnav_xx#shipping_templates'
+}
+
+CUSTOM_PAYMENTS_REPORTS_MAPPING = {
+    'us': "https://sellercentral.amazon.com/payments/reports/custom/request?tbla_daterangereportstable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%7D;search:undefined;pagination:1;",
+}
 
 bin_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
 if platform.startswith('win32') or platform.startswith('cygwin'):
@@ -108,3 +130,10 @@ logger.setLevel(logging.DEBUG)
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
+
+dispatcher.connect(capture_message, get_shipping_fee_failure)
+dispatcher.connect(capture_message, pick_marketplace_failure)
+dispatcher.connect(capture_message, choose_template_failure)
+dispatcher.connect(capture_message, change_shipping_price_failure)
+dispatcher.connect(capture_message, trigger_report_request_failure)
+dispatcher.connect(capture_message, generate_report_failure)

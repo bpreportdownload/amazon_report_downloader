@@ -27,7 +27,7 @@ class SellerLoginHelper(object):
 
     def is_login_required(self):
         url = self.driver.current_url
-        return url.find('/ap/signin') != -1
+        return url.find('/ap/signin') != -1 or url.find('/ap/mfa') != -1
 
     def login(self):
         try:

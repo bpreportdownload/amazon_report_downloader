@@ -1,0 +1,11 @@
+account:
+  marketplace: us
+  email: ""
+  password: ""
+
+rules:
+  template_name: ''
+  increase_hours: ''
+  decrease_hours: ''
+  increase_amount: 0.01
+  decrease_amount: 0.01
