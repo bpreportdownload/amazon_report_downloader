@@ -86,6 +86,8 @@ def update_shipping_price(config_path):
             logger.error('Could not login to seller central, exit!')
             sys.exit(1)
 
+        time.sleep(7)
+
         driver.get(shipping_templates_url)
 
     ShippingTemplateManager = getattr(

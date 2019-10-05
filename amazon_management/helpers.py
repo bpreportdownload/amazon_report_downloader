@@ -54,6 +54,8 @@ class SellerLoginHelper(object):
         except NoSuchElementException:
             pass
 
+        time.sleep(7)
+
         while True:
             try:
                 try:
@@ -70,6 +72,7 @@ class SellerLoginHelper(object):
                 time.sleep(3)
                 password_elem.send_keys(Keys.RETURN)
                 time.sleep(1)
+                break
             except NoSuchElementException:
                 break
 

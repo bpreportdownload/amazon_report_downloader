@@ -94,6 +94,8 @@ def request_report(config_path):
                 logger.error('Could not login to seller central, exit!')
                 sys.exit(1)
 
+            time.sleep(7)
+
             driver.get(generate_payments_reports_url)
 
         if not helper.pick_marketplace():
