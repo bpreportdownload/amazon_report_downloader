@@ -13,9 +13,9 @@ from amazon_management.inventory_manager import InventoryManager
 
 
 @click.command()
-@click.option('-c', '--config_path', help='Configuration file path.')
-@click.option('-k', '--keywords_path', help='Keywords file path.')
-def clear_inv_by_sku(config_path, keywords_path):
+def clear_inv_by_sku():
+    config_path = './inventory_download.yml'
+    keywords_path = './keywords.txt'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
         logger.error('Could not find configuration file - %s', config_path)

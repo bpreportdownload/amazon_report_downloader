@@ -87,7 +87,7 @@ class SellerLoginHelper(object):
                 EC.presence_of_element_located((By.XPATH, picker_xpath)))
             picker_elem = Select(picker_elem)
             cur_marketplace = picker_elem.first_selected_option.text.strip()
-            if cur_marketplace != marketplace_domain:
+            if cur_marketplace != marketplace_domain: #当前卖场和文件的卖场不同如何处理
                 picker_elem.select_by_visible_text(marketplace_domain)
 
             WebDriverWait(self.driver, 3).until(

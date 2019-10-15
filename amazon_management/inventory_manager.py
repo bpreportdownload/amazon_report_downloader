@@ -1,4 +1,8 @@
 import time
+import random
+import re
+import os
+from datetime import date
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -8,7 +12,7 @@ from selenium.common.exceptions import (
     StaleElementReferenceException)
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.alert import Alert
-
+from selenium import webdriver
 from amazon_management import logger
 
 
@@ -23,7 +27,11 @@ class InventoryManager(object):
             'select_all_selector': '#mt-select-all',
             'bulk_action_select_selector': 'div.mt-header-bulk-action select',
             'option_delete_selector': 'option#myitable-delete',
-            'continue_selector': '#interstitialPageContinue-announce'
+            'continue_selector': '#interstitialPageContinue-announce',
+            'password': '#password',
+            'email': '#email',
+            'login': 'body > div.container-fluid > div > div > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > button',
+            'orders_file': '#orders_file'
         }
 
     def get_total_products_cnt(self):
@@ -124,45 +132,694 @@ class InventoryManager(object):
             except StaleElementReferenceException:
                 pass
 
-        time.sleep(3)
-        Alert(self.driver).accept()
-        # try:
-        #     confirm_window = WebDriverWait(self.driver, 10).until(
-        #         EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, "remove the product or products")))
-        #     Alert(self.driver).accept()
-        # except (NoSuchElementException, TimeoutException):
-        #     raise RuntimeError('Could not select delete option - %s' % self.selectors['bulk_action_select_selector'])
 
-        time.sleep(3)
-
-        if '/inventory/confirmAction' in self.driver.current_url:
-            while True:
-                try:
-                    continue_elem = WebDriverWait(self.driver, 12).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['continue_selector'])))
-                    script = 'document.querySelector("{}").click()'.format(
-                        self.selectors['continue_selector'])
-                    self.driver.execute_script(script)
-                    # continue_elem.click()
-                    break
-                except StaleElementReferenceException:
-                    pass
-                except WebDriverException as e:
-                    if e.msg.find('is not clickable') != -1:
-                        logger.exception(e)
-                        continue
-
-                    raise e
-                except  (NoSuchElementException, TimeoutException):
-                    raise RuntimeError(
-                        'Could not find continue element - %s' % self.selectors['continue_selector'])
-
-            try:
-                WebDriverWait(self.driver, 12).until(
-                    EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Thanks for suggesting changes to the catalog')]")))
-                logger.info('Selected products are deleted!')
-            except (NoSuchElementException, TimeoutException):
-                logger.warning('Delete result could not determined!')
-                result = False
 
         return result
+
+
+class Download(object):
+    def __init__(self, driver):
+        self.driver = driver
+        self.selectors = {
+            'total_products_selector': '#mt-header-count-value',
+            'total_product_pages_selector': 'span.mt-totalpagecount',
+            'page_input_selector': 'input#myitable-gotopage',
+            'go_to_page_selector': '#myitable-gotopage-button > span > input',
+            'select_all_selector': '#mt-select-all',
+            'bulk_action_select_selector': 'div.mt-header-bulk-action select',
+            'option_delete_selector': 'option#myitable-delete',
+            'continue_selector': '#interstitialPageContinue-announce',
+            'email': '#email',
+            'password': '#password',
+            'login': 'body > div.container-fluid > div > div > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > button',
+            'seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'order_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'finance_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'FBA_shipments_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(2) > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'ads_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'campaigns_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(1) > div.panel-body > form > div:nth-child(4) > div > select',
+            'searchterms_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(2) > div.panel-body > form > div:nth-child(4) > div > select',
+            'orders_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
+            'finance_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(7) > div > button',
+            # 'general_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
+            'FBA_shipments_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(2) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
+            'listings_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'FBA_inventory_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'business_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
+            'order_shipments_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(2) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
+            'campaigns_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(1) > div.panel-body > form > div:nth-child(8) > div > button',
+            'ads_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(7) > div > button',
+            'searchterms_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(2) > div.panel-body > form > div:nth-child(7) > div > button',
+            'ads_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > select',
+            'finance_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > select',
+            'campaigns_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(1) > div.panel-body > form > div:nth-child(5) > div > select',
+            'searchterms_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(2) > div.panel-body > form > div:nth-child(5) > div > select',
+            'listings_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > select',
+            'FBA_inventory_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > select',
+            'business_country': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(6) > div > select',
+            'campaigns_date': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(1) > div.panel-body > form > div:nth-child(6) > div > input[type=date]',
+            'listings_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(7) > div > button',
+            'FBA_inventory_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(7) > div > button',
+            'business_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(8) > div > button'
+        }
+
+    def go_to_listings_download_page(self):
+
+        # 移动鼠标到inventory
+        try:
+            inventory = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-inventory')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
+            logger.info('go to inventory')
+            time.sleep(random.randint(7, 9))
+        except Exception as e:
+            print(e)
+
+        # click inventory reports
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-inventory"]/ul/li[7]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click inventory reports')
+        time.sleep(random.randint(4, 7))
+
+        # click Report Type drop down
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'a-autoid-0-announce'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click Report Type drop down')
+        time.sleep(random.randint(4, 7))
+
+        # click all listing report
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'dropdown1_7'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click all listing report')
+        time.sleep(random.randint(4, 7))
+
+        # click request report button
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="a-autoid-5"]/span/input'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click request report button')
+        time.sleep(random.randint(4, 7))
+
+        self.driver.refresh()
+
+        # download
+        current_url = self.driver.current_url
+
+        # 匹配“report_reference_id=”后面的数字
+        pattern = re.compile(r'(?<=report_reference_id=)\d+\.?\d*')
+        id = pattern.findall(current_url)[0]
+        time.sleep(random.randint(1, 6))
+        self.driver.refresh()
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="%s-report_download"]/div/a' % {id}))).click()
+        except Exception as e:
+            print(e)
+
+    def close_tooltips(self):
+        # close tooltips
+        try:
+            self.driver.find_element_by_xpath('//*[@id="step-0"]/div[2]/button').click()
+        except:
+            pass
+
+    def go_to_orders_download_page(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(7, 9))
+        except Exception as e:
+            print(e)
+
+        # click fulfillments
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click fulfillments')
+        time.sleep(random.randint(4, 7))
+
+        # click all orders
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.ID, 'FlatFileAllOrdersReport'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click all orders')
+        time.sleep(random.randint(1, 7))
+        # click order date drop down
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.ID, 'eventDateType'))).click()
+        except Exception as e:
+            print(e)
+        time.sleep(random.randint(1, 7))
+        # select Last Updated Date
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="eventDateType"]/select/option[2]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('choose Last Updated Date')
+        time.sleep(random.randint(1, 7))
+        # click download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('download request')
+        time.sleep(random.randint(1, 7))
+        while True:
+            try:
+                WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
+                logger.info('downloading')
+                time.sleep(random.randint(1, 7))
+                download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
+                # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
+                logger.info("download_button")
+                try:
+
+                    download_link = download_button.get_attribute("href")
+
+                    logger.info(download_link)
+                    orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+                    logger.info(orders_name)
+                    return orders_name + '.txt'
+                except Exception as e:
+                    print(e)
+            except StaleElementReferenceException:
+                pass
+            except (NoSuchElementException, TimeoutException):
+                break
+            except:
+                raise RuntimeError(
+                    'Could not find total product pages element - %s' % self.selectors['total_product_pages_selector'])
+
+    def go_to_FBA_download_page(self):
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(7, 9))
+        except Exception as e:
+            print(e)
+
+        # click fulfillments
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click fulfillments')
+        time.sleep(random.randint(4, 7))
+
+        # click Amazon Fulfilled Shipments
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'AFNShipmentReport'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click Amazon Fulfilled Shipments')
+        time.sleep(random.randint(1, 7))
+        # click  Request .txt Download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click  Request .txt Download')
+        time.sleep(random.randint(1, 7))
+        # click download
+        try:
+            download_button = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[5]/a')))
+            download_button.click()
+        except Exception as e:
+            print(e)
+        logger.info('downloading')
+        time.sleep(random.randint(1, 7))
+
+        try:
+
+            download_link = download_button.get_attribute("href")
+            logger.info(download_link)
+            FBA_shippment_name = re.findall(r"GET_AMAZON_FULFILLED_SHIPMENTS_DATA__(\d*)\.txt", download_link)[0]
+            logger.info(FBA_shippment_name)
+            return FBA_shippment_name + '.txt'
+        except Exception as e:
+            print(e)
+
+
+    def go_to_finance_download_page(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click payments
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[2]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click payments')
+        time.sleep(random.randint(4, 7))
+
+        # click data range report
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#PaymentTabs > div > ul > li:nth-child(4)'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click data range report')
+        time.sleep(random.randint(4, 7))
+
+        # click data range report
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportButton'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click data range report')
+        time.sleep(random.randint(4, 7))
+
+        # select date
+        try:
+            start = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate'))).click()
+            today = date.today.strftime("%m/%d/%y")
+            start.send_keys(today)
+            end = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate'))).click()
+            end.send_keys(today)
+        except Exception as e:
+            print(e)
+        logger.info('select date')
+        time.sleep(random.randint(4, 7))
+
+        # generate
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('select date')
+        time.sleep(random.randint(4, 7))
+
+        # generate
+        try:
+            WebDriverWait(self.driver, 400, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('select date')
+        time.sleep(random.randint(4, 7))
+
+
+
+    def go_to_FBA_inventory_download_page(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click fulfillments
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click fulfillments')
+        time.sleep(random.randint(4, 7))
+
+        # click inventory show more
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[2]/li[23]/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click inventory show more')
+        time.sleep(random.randint(4, 7))
+
+        # click Manage FBA Inventory
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'FBA_MYI_UNSUPPRESSED_INVENTORY')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('click Manage FBA Inventory')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click Request .txt Download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('Request .txt Download')
+        time.sleep(random.randint(4, 7))
+
+        self.driver.refresh()
+
+        # click download
+        try:
+            download_button = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr/td[5]/a')))
+            download_button.click()
+        except Exception as e:
+            print(e)
+        logger.info('downloading')
+        time.sleep(random.randint(1, 7))
+
+        try:
+            download_link = download_button.get_attribute("href")
+            logger.info(download_link)
+            FBA_inventory = re.findall(r"_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA__(\d*)\.txt", download_link)[0]
+            logger.info(FBA_inventory)
+            return FBA_inventory + '.txt'
+        except Exception as e:
+            print(e)
+
+    def go_to_advertising_reports_download_page(self):
+
+        # 移动鼠标到reports
+        inventory = self.driver.find_element_by_id("sc-navtab-reports")
+
+        webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
+        logger.info('go to reports')
+        time.sleep(random.randint(1, 7))
+
+        # click fulfillments
+        self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[5]/a').click()
+        time.sleep(random.randint(1, 7))
+
+        # click inventory more
+        self.driver.find_element_by_xpath('//*[@id="sc-sidepanel"]/div/ul[2]/li[23]/a').click()
+        time.sleep(random.randint(1, 7))
+        # click Manage FBA Inventory
+        self.driver.find_element_by_id("FBA_MYI_UNSUPPRESSED_INVENTORY").click()
+        time.sleep(random.randint(1, 7))
+        # click Request .txt Download
+        self.driver.find_element_by_xpath('//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button').click()
+        time.sleep(random.randint(1, 7))
+        self.driver.refresh()
+
+    def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
+
+        rootdir = os.path.expanduser('~/Downloads/')
+        logger.info(rootdir)
+        file_path = rootdir + file_name
+
+        logger.info("gideon login")
+        self.driver.get("https://300gideon.com/login")
+
+        try:
+            email_input_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['email'])))
+            email_input_elem.clear()
+            email_input_elem.send_keys(email)
+            logger.info("put password")
+            password_input_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['password'])))
+            password_input_elem.clear()
+            password_input_elem.send_keys(password)
+            login_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['login'])))
+            login_elem.click()
+        except Exception as e:
+            print(e)
+        time.sleep(4)
+
+        logger.info("upload file to gideon")
+        self.driver.get(url)
+
+        if file_type == "orders_file":
+
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['order_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+
+            logger.info("file_upload")
+            file_upload.send_keys(file_path)
+
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['orders_import']))).click()
+
+        if file_type == "order_shipments_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_import']))).click()
+
+        if file_type == "finances_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_import']))).click()
+
+        if file_type == "ads_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_import']))).click()
+
+        if file_type == "campaigns_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("select report date")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
+            country_elem.value = ""
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_import']))).click()
+
+        if file_type == "searchterms_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_import']))).click()
+
+        if file_type == "listings_file":
+
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_import']))).click()
+
+        if file_type == "inventory_file":
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_import']))).click()
+
+        if file_type == "business_file":
+            logger.info("select seller")
+            seller_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_seller_selector'])))
+            Select(seller_elem).select_by_value(seller_id)
+
+            logger.info("select country")
+            country_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_country'])))
+            Select(country_elem).select_by_value(country)
+
+            logger.info("file_upload")
+            file_upload = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, file_type))
+            )
+            file_upload.send_keys(file_path)
+
+            logger.info("file import")
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
+
+        self.driver.quite()
+
+    def upload_FBA_shippment_files(self, url, file_name, email, password, seller_id):
+
+        pass
+
+    def upload_FBA_inventory_files(self, url, file_name, email, password, seller_id):
+
+        pass
+
+    def upload_listings_files(self, url, file_name, email, password, seller_id):
+
+        rootdir = os.path.expanduser('~/Downloads/')
+        logger.info(rootdir)
+        file_path = rootdir + file_name
+
+        logger.info("open gideon")
+        self.driver.get("https://300gideon.com/login")
+        logger.info("put email")
+        try:
+            email_input_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['email'])))
+            email_input_elem.clear()
+            email_input_elem.send_keys(email)
+            logger.info("put password")
+            password_input_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['password'])))
+            password_input_elem.clear()
+            password_input_elem.send_keys(password)
+            login_elem = WebDriverWait(self.driver, 7).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['login'])))
+            login_elem.click()
+        except Exception as e:
+            print(e)
+        time.sleep(4)
+
+        self.driver.get(url)
+        seller_elem = self.driver.find_element_by_xpath(
+            '//*[@id="page-content-wrapper"]/div[3]/div/div[1]/div/div/div[2]/form/div[1]/div/select')
+        Select(seller_elem).select_by_value(seller_id)
+        file_upload = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "inventory_file"))
+        )
+        logger.info("file_upload")
+        file_upload.send_keys(file_path)
+        logger.info("file import")
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH,
+                                                '//*[@id="page-content-wrapper"]/div[3]/div/div[1]/div/div/div[2]/form/div[3]/div/button'))).click()
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+        self.driver.quit()

@@ -19,7 +19,6 @@ from amazon_management.signals import (
     generate_report_failure
 )
 
-sentry_sdk.init("https://d51046fa20ba4b889f373384feea075e@sentry.io/1544767")
 
 MARKETPLACE_MAPPING = {
     'us': {
@@ -97,12 +96,13 @@ if not os.path.isdir(shared_work_directory):
 
 drivers = dict()
 
+
 def get_shared_driver(marketplace):
     marketplace = marketplace.upper()
     if drivers.get(marketplace, None):
         return drivers.get(marketplace)
-
-    data_dir = os.path.join(shared_work_directory, 'data')
+    # data_dir = os.path.join(shared_work_directory, 'data')
+    data_dir = os.path.join(shared_work_directory, marketplace)
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
 
@@ -124,12 +124,14 @@ def get_shared_driver(marketplace):
 
     return driver
 
+
 logger = logging.getLogger('AmazonSellerManagement')
 formatter = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
 logger.setLevel(logging.DEBUG)
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
+
 
 dispatcher.connect(capture_message, get_shipping_fee_failure)
 dispatcher.connect(capture_message, pick_marketplace_failure)
