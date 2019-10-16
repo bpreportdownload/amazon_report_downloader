@@ -3,6 +3,8 @@ import random
 import re
 import os
 from datetime import date
+import calendar
+import urllib.request
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -247,6 +249,8 @@ class Download(object):
         except Exception as e:
             print(e)
 
+        return 'All+Listings+Report+' + date.today.strftime("%m-%d-%Y")
+
     def close_tooltips(self):
         # close tooltips
         try:
@@ -327,7 +331,7 @@ class Download(object):
                 raise RuntimeError(
                     'Could not find total product pages element - %s' % self.selectors['total_product_pages_selector'])
 
-    def go_to_FBA_download_page(self):
+    def go_to_FBA_shipment_download_page(self):
         # 移动鼠标到reports
         try:
             reports = WebDriverWait(self.driver, 40, 0.5).until(
@@ -415,7 +419,7 @@ class Download(object):
         logger.info('click data range report')
         time.sleep(random.randint(4, 7))
 
-        # click data range report
+        # click generate report
         try:
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportButton'))).click()
@@ -447,16 +451,15 @@ class Download(object):
         logger.info('select date')
         time.sleep(random.randint(4, 7))
 
-        # generate
+        # download report
         try:
             WebDriverWait(self.driver, 400, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton'))).click()
         except Exception as e:
             print(e)
-        logger.info('select date')
+        logger.info('download report')
         time.sleep(random.randint(4, 7))
-
-
+        return date.today.year + calendar.month_abbr[date.today.month] + date.today.day + '-' + date.today.year + calendar.month_abbr[date.today.month] + date.today.day + 'CustomTransaction.csv'
 
     def go_to_FBA_inventory_download_page(self):
 
@@ -533,26 +536,224 @@ class Download(object):
     def go_to_advertising_reports_download_page(self):
 
         # 移动鼠标到reports
-        inventory = self.driver.find_element_by_id("sc-navtab-reports")
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
 
-        webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
-        logger.info('go to reports')
-        time.sleep(random.randint(1, 7))
+        # click advertising reports
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click advertising reports')
+        time.sleep(random.randint(4, 7))
 
-        # click fulfillments
-        self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[5]/a').click()
-        time.sleep(random.randint(1, 7))
+        # choose daily
+        try:
+            # click drop down
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[2]/span/span'))).click()
 
-        # click inventory more
-        self.driver.find_element_by_xpath('//*[@id="sc-sidepanel"]/div/ul[2]/li[23]/a').click()
-        time.sleep(random.randint(1, 7))
-        # click Manage FBA Inventory
-        self.driver.find_element_by_id("FBA_MYI_UNSUPPRESSED_INVENTORY").click()
-        time.sleep(random.randint(1, 7))
-        # click Request .txt Download
-        self.driver.find_element_by_xpath('//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button').click()
-        time.sleep(random.randint(1, 7))
-        self.driver.refresh()
+            # click daily
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown1_1"]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click advertising reports')
+        time.sleep(random.randint(4, 7))
+
+        # click create report
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[1]/span/span/input'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click create report')
+        time.sleep(random.randint(4, 7))
+
+        # click download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[2]/div/div[5]/span/span/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click download')
+        time.sleep(random.randint(4, 7))
+
+        return 'Sponsored Products Search term report.xlsx'
+
+    def go_to_advertising_reports_download_page(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click advertising reports
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click advertising reports')
+        time.sleep(random.randint(4, 7))
+
+        # choose daily
+        try:
+            # click drop down
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[2]/span/span'))).click()
+
+            # click daily
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown1_1"]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click advertising reports')
+        time.sleep(random.randint(4, 7))
+
+        # click create report
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[1]/span/span/input'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click create report')
+        time.sleep(random.randint(4, 7))
+
+        # click download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[2]/div/div[5]/span/span/a'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click download')
+        time.sleep(random.randint(4, 7))
+
+        return 'Sponsored Products Search term report.xlsx'
+
+    def go_to_campaigns_bulk_report_download(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click advertising reports
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click advertising reports')
+        time.sleep(random.randint(4, 7))
+
+        # click bulk operations
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[1]/nav/ul/a[3]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click bulk operations')
+        time.sleep(random.randint(4, 7))
+
+        # click create spreadsheet for download
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="request-entity-report-submit"]/span/input'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click create spreadsheet for download')
+        time.sleep(random.randint(4, 7))
+
+        # click download
+        try:
+            download_button = WebDriverWait(self.driver, 900, 0.5).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, '//*[@id="downloadHistoryId"]/tbody/tr[2]/td[2]/div/a'))).click()
+
+            logger.info('click download')
+            time.sleep(random.randint(4, 7))
+            download_link = download_button.get_attribute("href")
+            res = urllib.request.urlopen(download_link)
+            location = res.headers['location']
+            bulk_report = re.findall(r"amazonaws.com/(.*)?\.xlsx", location)[0]
+            logger.info(bulk_report)
+
+            return bulk_report + '.xlsx'
+        except Exception as e:
+            print(e)
+
+    def go_to_business_report_download(self):
+
+        # 移动鼠标到reports
+        try:
+            reports = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            time.sleep(random.randint(4, 7))
+            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            logger.info('go to reports')
+            time.sleep(random.randint(5, 9))
+        except Exception as e:
+            print(e)
+
+        # click business reports
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[4]'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click business reports')
+        time.sleep(random.randint(4, 7))
+
+        # click detail page sales and traffic
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, '#report_DetailSalesTrafficBySKU'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click detail page sales and traffic')
+        time.sleep(random.randint(4, 7))
+
+        # click download drop down
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="export"]/div'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click download drop down')
+        time.sleep(random.randint(4, 7))
+
+        # choose csv
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, '#downloadCSV'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('choose csv')
+        time.sleep(random.randint(4, 7))
+        return 'BusinessReport-' + date.today.strftime("%m-%d-%y") + '.csv'
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
 
@@ -768,6 +969,11 @@ class Download(object):
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
+
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(e)
 
         self.driver.quite()
 

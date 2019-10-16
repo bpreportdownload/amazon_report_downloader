@@ -9,9 +9,9 @@ from amazon_management import logger, get_shared_driver, MARKETPLACE_MAPPING
 from amazon_management.utils import YamlConfigLoader
 from amazon_management.helpers import SellerLoginHelper
 from amazon_management.inventory_manager import Download
+from apscheduler.schedulers.blocking import BlockingScheduler
 
-
-@click.command()
+# @click.command()
 def download_inventories():
     config_path = './inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
@@ -28,6 +28,10 @@ def download_inventories():
     gideon_email = config['account']['gideon_email']
     gideon_password = config['account']['gideon_password']
     seller_id = config['account']['seller_id']
+
+
+
+
     driver = get_shared_driver(marketplace)
     helper = SellerLoginHelper(driver, email, password, marketplace)
     downloader = Download(driver)
@@ -65,11 +69,11 @@ def download_inventories():
         file_name = downloader.go_to_orders_download_page()
         logger.info(file_name)
         downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id)
-        FBA_shippment_name = downloader.go_to_FBA_download_page()
+        FBA_shippment_name = downloader.go_to_FBA_shipment_download_page()
         downloader.upload_FBA_shippment_files("https://300gideon.com/import_orders", FBA_shippment_name, gideon_email, gideon_password, seller_id)
 
-        # listing_report = downloader.go_to_listings_download_page()
-        # downloader.upload_listings_files("https://300gideon.com/import_listings", listing_report, gideon_email, gideon_password, seller_id)
+        listing_report = downloader.go_to_listings_download_page()
+        downloader.upload_listings_files("https://300gideon.com/import_listings", listing_report, gideon_email, gideon_password, seller_id)
 
         FBA_inventory = downloader.go_to_FBA_inventory_download_page()
         downloader.upload_FBA_inventory_files("https://300gideon.com/import_inventory", FBA_inventory, gideon_email,
