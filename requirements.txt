@@ -4,3 +4,4 @@ click
 pyyaml
 PyPyDispatcher
 sentry-sdk
+apscheduler

@@ -6,7 +6,7 @@ import logging
 from pydispatch import dispatcher
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
-
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import sentry_sdk
 from sentry_sdk import capture_message
 
@@ -111,15 +111,16 @@ def get_shared_driver(marketplace):
     opts.add_argument('-allow-running-insecure-content')
     opts.add_argument('--profile-directory={}'.format(marketplace))
     opts.add_argument('user-data-dir={}'.format(data_dir))
+
     caps = opts.to_capabilities()
+
 
     options = {
         'executable_path': driver_path,
-        'desired_capabilities': caps
+        'desired_capabilities': caps,
     }
     driver = WebDriver(**options)
-    driver.set_window_size(1200, 900)
-    driver.set_window_position(0, 0)
+    driver.maximize_window()
     drivers[marketplace] = driver
 
     return driver

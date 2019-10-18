@@ -13,7 +13,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 # @click.command()
 def download_inventories():
-    config_path = './inventory_download.yml'
+    config_path = './amazon_management/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
         logger.error('Could not find configuration file - %s', config_path)
@@ -28,9 +28,6 @@ def download_inventories():
     gideon_email = config['account']['gideon_email']
     gideon_password = config['account']['gideon_password']
     seller_id = config['account']['seller_id']
-
-
-
 
     driver = get_shared_driver(marketplace)
     helper = SellerLoginHelper(driver, email, password, marketplace)
@@ -65,27 +62,72 @@ def download_inventories():
     logger.info('Picked marketplace!')
 
     try:
+        marketplace = config['account']['marketplace'].upper()
         downloader.close_tooltips()
-        file_name = downloader.go_to_orders_download_page()
-        logger.info(file_name)
-        downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id)
-        FBA_shippment_name = downloader.go_to_FBA_shipment_download_page()
-        downloader.upload_FBA_shippment_files("https://300gideon.com/import_orders", FBA_shippment_name, gideon_email, gideon_password, seller_id)
+        # try:
+        #     file_name = downloader.go_to_orders_download_page()
+        #     downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "orders_file", marketplace)
+        # except Exception as e:
+        #     print(e)
+        #
+        # try:
+        #     file_name = downloader.go_to_FBA_shipment_download_page()
+        #     downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "order_shipments_file", marketplace)
+        # except Exception as e:
+        #     print(e)
+        #
+        # try:
+        #     file_name = downloader.go_to_finance_download_page()
+        #     downloader.upload_files("https://300gideon.com/import_finances", file_name, gideon_email, gideon_password, seller_id, "finances_file", marketplace)
+        # except Exception as e:
+        #     print(e)
+        #
+        # try:
+        #     file_name = downloader.go_to_advertising_reports_download_page()
+        #     downloader.upload_files("https://300gideon.com/import_ads", file_name, gideon_email,
+        #                                      gideon_password, seller_id, "ads_file", marketplace)
+        # except Exception as e:
+        #     print(e)
+        #
+        # try:
+        #     file_name = downloader.go_to_campaigns_bulk_report_download()
+        #     downloader.upload_files("https://300gideon.com/import_campaigns", file_name, gideon_email,
+        #                                           gideon_password, seller_id, "campaigns_file", marketplace)
+        # except Exception as e:
+        #     print(e)
+        #
+        # try:
+        #     file_name = downloader.go_to_advertising_search_term_reports_download_page()
+        #     downloader.upload_files("https://300gideon.com/import_campaigns", file_name, gideon_email,
+        #                                           gideon_password, seller_id, "searchterms_file", marketplace)
+        # except Exception as e:
+        #     print(e)
 
-        listing_report = downloader.go_to_listings_download_page()
-        downloader.upload_listings_files("https://300gideon.com/import_listings", listing_report, gideon_email, gideon_password, seller_id)
+        try:
+            file_name = downloader.go_to_listings_download_page()
+            downloader.upload_files("https://300gideon.com/import_listings", file_name, gideon_email,
+                                                  gideon_password, seller_id, "listings_file", marketplace)
+        except Exception as e:
+            print(e)
 
-        FBA_inventory = downloader.go_to_FBA_inventory_download_page()
-        downloader.upload_FBA_inventory_files("https://300gideon.com/import_inventory", FBA_inventory, gideon_email,
-                                         gideon_password, seller_id)
+        try:
+            file_name = downloader.go_to_FBA_inventory_download_page()
+            downloader.upload_files("https://300gideon.com/import_inventory", file_name, gideon_email,
+                                                  gideon_password, seller_id, "inventory_file", marketplace)
+        except Exception as e:
+            print(e)
 
-        FBA_inventory = downloader.go_to_FBA_inventory_download_page()
-        downloader.upload_FBA_inventory_files("https://300gideon.com/import_inventory", FBA_inventory, gideon_email,
-                                              gideon_password, seller_id)
+        try:
+            file_name = downloader.go_to_business_report_download()
+            downloader.upload_files("https://300gideon.com/import_business", file_name, gideon_email,
+                                                  gideon_password, seller_id, "business_file", marketplace)
 
+        except Exception as e:
+            print(e)
+
+        downloader.close_webdriver()
     except Exception as e:
         print(e)
-
 
 if __name__ == '__main__':
     download_inventories()
