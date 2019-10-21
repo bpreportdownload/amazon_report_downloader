@@ -61,7 +61,7 @@ setup(
     entry_points={
         'console_scripts': [
             'upload=amazon_management.bin.upload_files:upload',
-            'download_inventories=amazon_management.bin.download_inventories:download_inventories',
+            'download_report=amazon_management.bin.download_report:download_report',
             'clear_inv_by_sku=amazon_management.bin.clear_inv_by_sku:clear_inv_by_sku',
             'update_shipping_price=amazon_management.bin.update_shipping_price:update_shipping_price',
             'generate_financial_transactions=amazon_management.bin.generate_financial_transactions:request_report'

@@ -1,0 +1,2 @@
+download_report -c advertising_search_term_report
+

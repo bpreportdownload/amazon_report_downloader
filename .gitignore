@@ -41,6 +41,8 @@ venv/
 ENV/
 *.xml
 
+amazon_management/inventory_download.yml
+
 .pytest*
 
 *.log
