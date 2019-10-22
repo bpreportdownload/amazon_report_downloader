@@ -979,7 +979,7 @@ class Download(object):
             logger.info("select report date")
             date_elem = WebDriverWait(self.driver, 7).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
-            date_elem.value = datetime.date.today().strftime("%Y-%m-%d")
+            date_elem.value = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
             time.sleep(5)
             logger.info("file_upload")
             file_upload = WebDriverWait(self.driver, 10).until(
