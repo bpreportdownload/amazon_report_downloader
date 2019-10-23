@@ -1112,6 +1112,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
 
         try:
+            time.sleep(random.randint(1, 5))
             self.driver.close()
             self.driver.switch_to_window(handles[0])
             os.remove(file_path)
