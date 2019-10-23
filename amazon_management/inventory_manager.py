@@ -561,10 +561,15 @@ class Download(object):
 
         # click inventory show more
         try:
-            WebDriverWait(self.driver, 40, 0.5).until(
+            WebDriverWait(self.driver, 10, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[2]/li[23]/a'))).click()
         except Exception as e:
             print(e)
+            try:
+                WebDriverWait(self.driver, 10, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[2]/li[21]/a'))).click()
+            except Exception as e:
+                print(e)
         logger.info('click inventory show more')
         time.sleep(random.randint(4, 7))
 
@@ -710,7 +715,6 @@ class Download(object):
             except Exception as e:
                 print(e)
 
-
         # choose daily
         try:
             # click drop down
@@ -722,7 +726,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown1_1"]'))).click()
         except Exception as e:
             print(e)
-        logger.info('click advertising reports')
+        logger.info('choose daily')
         time.sleep(random.randint(4, 7))
 
         # click create report
