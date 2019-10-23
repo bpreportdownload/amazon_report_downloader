@@ -68,6 +68,7 @@ def download_report(report):
 
         try:
             marketplace = marketplace.upper()
+            logger.info(marketplace)
             downloader.close_tooltips()
 
             if report == "order_report":
