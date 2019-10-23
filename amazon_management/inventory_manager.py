@@ -895,6 +895,7 @@ class Download(object):
 
             logger.info("file_upload")
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -914,6 +915,7 @@ class Download(object):
             file_upload.send_keys(file_path)
 
             self.scroll_down()
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -936,6 +938,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -958,8 +961,9 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
+
             logger.info("file import")
-            time.sleep(5)
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_import']))).click()
 
@@ -986,6 +990,8 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
+
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_import']))).click()
@@ -1007,6 +1013,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             self.scroll_down()
@@ -1030,6 +1037,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -1051,6 +1059,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -1077,6 +1086,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, file_type))
             )
             file_upload.send_keys(file_path)
+            time.sleep(random.randint(1, 5))
 
             logger.info("file import")
             WebDriverWait(self.driver, 40, 0.5).until(
