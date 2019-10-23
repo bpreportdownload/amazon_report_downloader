@@ -411,13 +411,13 @@ class Download(object):
         logger.info('click event date drop down')
         time.sleep(random.randint(1, 7))
 
-        # choose last 3 days
+        # choose yesterday
         try:
             WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child(3)'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child(2)'))).click()
         except Exception as e:
             print(e)
-        logger.info('choose last 3 days')
+        logger.info('choose yesterday')
         time.sleep(random.randint(1, 7))
 
         # click  Request .txt Download
@@ -495,7 +495,7 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            three_days_ago = (datetime.date.today() - datetime.timedelta(days=5)).strftime("%m/%d/%Y")
+            three_days_ago = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
             start.send_keys(three_days_ago)
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
