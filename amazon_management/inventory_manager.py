@@ -401,6 +401,25 @@ class Download(object):
             print(e)
         logger.info('click Amazon Fulfilled Shipments')
         time.sleep(random.randint(1, 7))
+
+        # click event date drop down
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('click event date drop down')
+        time.sleep(random.randint(1, 7))
+
+        # choose last 3 days
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child(3)'))).click()
+        except Exception as e:
+            print(e)
+        logger.info('choose last 3 days')
+        time.sleep(random.randint(1, 7))
+
         # click  Request .txt Download
         try:
             WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
