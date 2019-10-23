@@ -201,9 +201,6 @@ class Download(object):
             'business_report': '',
         }
 
-    # [1.order_report 2.FBA_shipment_report 3.finance_report 4.advertising_report 5.campaigns_bulk_report 6.
-    #  advertising_search_term_report 7.listings_report 8.FBA_inventory_report 9.business_report]
-
 
 
     def scroll_down(self,):
