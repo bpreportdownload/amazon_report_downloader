@@ -479,12 +479,13 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            today = datetime.date.today().strftime("%m/%d/%y")
-            start.send_keys(today)
+            three_days_ago = (datetime.date.today() - datetime.timedelta(days=5)).strftime("%m/%d/%Y")
+            start.send_keys(three_days_ago)
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            end.send_keys(today)
+            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            end.send_keys(yesterday)
         except Exception as e:
             print(e)
         logger.info('select date')
@@ -497,9 +498,10 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('select date')
-        time.sleep(random.randint(4, 7))
+        time.sleep(random.randint(30, 60))
         self.scroll_down()
-
+        self.driver.refresh()
+        time.sleep(random.randint(10, 20))
         # click download
         try:
             download_button = WebDriverWait(self.driver, 900, 0.5).until(
@@ -511,7 +513,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
             bulk_report = re.findall(r"fileName=(.*)?\.csv", download_link)[0]
             logger.info(bulk_report)
-
+            time.sleep(random.randint(10, 20))
             return bulk_report + '.csv'
         except Exception as e:
             print(e)
@@ -980,6 +982,7 @@ class Download(object):
             date_elem = WebDriverWait(self.driver, 7).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
             date_elem.value = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+            logger.info(date_elem.value)
             time.sleep(5)
             logger.info("file_upload")
             file_upload = WebDriverWait(self.driver, 10).until(

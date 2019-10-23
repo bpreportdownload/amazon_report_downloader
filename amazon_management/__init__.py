@@ -111,6 +111,7 @@ def get_shared_driver(marketplace):
     opts.add_argument('-allow-running-insecure-content')
     opts.add_argument('--profile-directory={}'.format(marketplace))
     opts.add_argument('user-data-dir={}'.format(data_dir))
+    opts.add_argument('--lang=en-us')
 
     caps = opts.to_capabilities()
 
