@@ -277,9 +277,9 @@ class Download(object):
                 break
             except Exception as e:
                 print(e)
-        logger.info('All+Listings+Report+' + datetime.date.today().strftime("%m-%d-%Y") + ".txt")
+        logger.info('All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt")
         time.sleep(random.randint(1, 6))
-        return 'All+Listings+Report+' + datetime.date.today().strftime("%m-%d-%Y") + ".txt"
+        return 'All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt"
 
     def close_tooltips(self):
         # close tooltips
@@ -495,12 +495,12 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            three_days_ago = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
+            three_days_ago = (datetime.datetime.utcnow().date() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
             start.send_keys(three_days_ago)
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            yesterday = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
             end.send_keys(yesterday)
         except Exception as e:
             print(e)
@@ -872,7 +872,7 @@ class Download(object):
             print(e)
         logger.info('choose csv')
         time.sleep(random.randint(4, 7))
-        return 'BusinessReport-' + datetime.date.today().strftime("%m-%d-%y") + '.csv'
+        return 'BusinessReport-' + datetime.datetime.utcnow().date().strftime("%m-%d-%y") + '.csv'
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
 
@@ -1005,7 +1005,7 @@ class Download(object):
             logger.info("select report date")
             date_elem = WebDriverWait(self.driver, 7).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
-            date_elem.value = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+            date_elem.value = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
             logger.info(date_elem.value)
             time.sleep(5)
             logger.info("file_upload")
@@ -1097,7 +1097,7 @@ class Download(object):
             logger.info("select report date")
             date_elem = WebDriverWait(self.driver, 7).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_date'])))
-            date_elem.value = datetime.date.today().strftime("%Y-%m-%d")
+            date_elem.value = datetime.datetime.utcnow().date().strftime("%Y-%m-%d")
 
             logger.info("select country")
             country_elem = WebDriverWait(self.driver, 7).until(
