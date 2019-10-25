@@ -3,15 +3,12 @@ import os
 import sys
 import time
 import click
-import random
 
 from amazon_management import logger, get_shared_driver, MARKETPLACE_MAPPING
 from amazon_management.utils import YamlConfigLoader
 from amazon_management.helpers import SellerLoginHelper
 from amazon_management.inventory_manager import Download
-from amazon_management.inventory_manager import MultiCronTrigger
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
+
 
 
 @click.command()
@@ -20,10 +17,10 @@ def download_report(report):
     logger.info(report)
     config_path = './amazon_management/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
-    # if not os.path.isfile(config_path):
-    #     logger.error('Could not find configuration file - %s', config_path)
-    #     sys.exit(0)
-    #
+    if not os.path.isfile(config_path):
+        logger.error('Could not find configuration file - %s', config_path)
+        sys.exit(0)
+
     cl = YamlConfigLoader(config_path)
     config = cl.load()
 
@@ -144,6 +141,7 @@ def download_report(report):
             downloader.close_webdriver()
         except Exception as e:
             print(e)
+
 
 if __name__ == '__main__':
     download_report()

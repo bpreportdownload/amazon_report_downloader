@@ -6,8 +6,6 @@ import logging
 from pydispatch import dispatcher
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import sentry_sdk
 from sentry_sdk import capture_message
 
 from amazon_management.signals import (

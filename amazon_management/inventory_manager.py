@@ -3,10 +3,6 @@ import random
 import re
 import os
 import datetime
-import calendar
-import urllib.request
-import json
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.base import BaseTrigger
 
 from selenium.webdriver.common.by import By
@@ -16,133 +12,9 @@ from selenium.common.exceptions import (
     TimeoutException, NoSuchElementException, WebDriverException,
     StaleElementReferenceException)
 
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.alert import Alert
 from selenium import webdriver
 from amazon_management import logger
-
-
-class InventoryManager(object):
-    def __init__(self, driver):
-        self.driver = driver
-        self.selectors = {
-            'total_products_selector': '#mt-header-count-value',
-            'total_product_pages_selector': 'span.mt-totalpagecount',
-            'page_input_selector': 'input#myitable-gotopage',
-            'go_to_page_selector': '#myitable-gotopage-button > span > input',
-            'select_all_selector': '#mt-select-all',
-            'bulk_action_select_selector': 'div.mt-header-bulk-action select',
-            'option_delete_selector': 'option#myitable-delete',
-            'continue_selector': '#interstitialPageContinue-announce',
-            'password': '#password',
-            'email': '#email',
-            'login': 'body > div.container-fluid > div > div > div > div > div > div > div.panel-body > form > div:nth-child(5) > div > button',
-            'orders_file': '#orders_file'
-        }
-
-    def get_total_products_cnt(self):
-        total_products_cnt = 0
-        total_products_str = ''
-        while True:
-            try:
-                total_products_elem = WebDriverWait(self.driver, 12).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['total_products_selector'])))
-                total_products_str = total_products_elem.get_attribute('innerText')
-                total_products_cnt = int(total_products_str.replace(',', ''))
-                break
-            except StaleElementReferenceException:
-                pass
-            except (NoSuchElementException, TimeoutException):
-                raise RuntimeError(
-                    'Could not find total products element - %s' % self.selectors['total_products_selector'])
-            except ValueError:
-                raise RuntimeError('Could not parse total products text - %s' % total_products_str)
-
-        return total_products_cnt
-
-    def get_total_product_pages_cnt(self):
-        total_product_pages_cnt = 0
-        total_product_pages_str = ''
-        while True:
-            try:
-                total_product_pages_elem = WebDriverWait(self.driver, 12).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['total_product_pages_selector'])))
-                total_product_pages_str = total_product_pages_elem.text
-                total_product_pages_cnt = int(total_product_pages_str.split(' ').pop())
-                break
-            except StaleElementReferenceException:
-                pass
-            except (NoSuchElementException, TimeoutException):
-                total_product_pages_cnt = 0
-                break
-            except ValueError:
-                raise RuntimeError('Could not parse total product pages text - %s' % total_product_pages_str)
-            except:
-                raise RuntimeError(
-                    'Could not find total product pages element - %s' % self.selectors['total_product_pages_selector'])
-
-        return total_product_pages_cnt
-
-    def go_to_page(self, page):
-        while True:
-            try:
-                page_input_elem = WebDriverWait(self.driver, 7).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['page_input_selector'])))
-                page_input_elem.clear()
-                page_input_elem.send_keys(page)
-
-                go_to_page_elem = WebDriverWait(self.driver, 3).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['go_to_page_selector'])))
-                go_to_page_elem.click()
-
-                break
-            except StaleElementReferenceException:
-                pass
-            except:
-                break
-
-    def select_all(self):
-        while True:
-            try:
-                select_all_elem = WebDriverWait(self.driver, 7).until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, self.selectors['select_all_selector'])))
-                script = 'document.querySelector("{}").click()'.format(
-                    self.selectors['select_all_selector'])
-                self.driver.execute_script(script)
-                break
-            except StaleElementReferenceException as e:
-                logger.exception(e)
-            except WebDriverException as e:
-                if e.msg.find('is not clickable') != -1:
-                    logger.exception(e)
-                    continue
-
-                raise e
-            except:
-                raise RuntimeError(
-                    'Could not find select all element - %s' % self.selectors['select_all_selector'])
-
-    def scroll_down(self,):
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
-    def delete_selected(self):
-        result = True
-
-        while True:
-            try:
-                bulk_action_select_elem = WebDriverWait(self.driver, 3).until(
-                        EC.element_to_be_clickable((By.CSS_SELECTOR, self.selectors['bulk_action_select_selector'])))
-                bulk_action_select = Select(bulk_action_select_elem)
-                bulk_action_select.select_by_value('myitable-delete')
-                break
-            except StaleElementReferenceException:
-                pass
-
-
-
-        return result
-
 
 class Download(object):
     def __init__(self, driver):
@@ -169,7 +41,6 @@ class Download(object):
             'searchterms_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div:nth-child(2) > div.panel-body > form > div:nth-child(4) > div > select',
             'orders_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
             'finance_import': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(7) > div > button',
-            # 'general_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(1) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
             'FBA_shipments_import': '#page-content-wrapper > div:nth-child(3) > div > div:nth-child(2) > div > div > div.panel-body > form > div:nth-child(6) > div > button',
             'listings_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
             'FBA_inventory_seller_selector': '#page-content-wrapper > div:nth-child(3) > div > div > div > div > div.panel-body > form > div:nth-child(4) > div > select',
@@ -222,8 +93,9 @@ class Download(object):
 
             # click inventory reports
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-inventory"]/ul/li[7]/a'))).click()
+                js_click_inventory_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(7) > a').click();"
+                self.driver.execute_script(js_click_inventory_reports)
+
                 logger.info('click inventory reports')
                 time.sleep(random.randint(4, 7))
                 break
@@ -278,7 +150,7 @@ class Download(object):
             except Exception as e:
                 print(e)
         logger.info('All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt")
-        time.sleep(random.randint(1, 6))
+        time.sleep(random.randint(20, 50))
         return 'All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt"
 
     def close_tooltips(self):
@@ -304,7 +176,8 @@ class Download(object):
 
             # click fulfillments
             try:
-                WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+                self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
                 time.sleep(random.randint(1, 7))
                 break
@@ -347,7 +220,7 @@ class Download(object):
             try:
                 WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
                 logger.info('downloading')
-                time.sleep(random.randint(1, 7))
+                time.sleep(random.randint(20, 50))
                 download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
                 # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
                 logger.info("download_button")
@@ -384,8 +257,8 @@ class Download(object):
 
             # click fulfillments
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+                self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
                 time.sleep(random.randint(4, 7))
                 break
@@ -435,7 +308,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('downloading')
-        time.sleep(random.randint(1, 7))
+        time.sleep(random.randint(20, 50))
 
         try:
             download_link = download_button.get_attribute("href")
@@ -450,7 +323,7 @@ class Download(object):
     def go_to_finance_download_page(self):
 
         # 移动鼠标到reports
-        for i in range(0, 3):
+        for i in range(0, 8):
             try:
                 reports = WebDriverWait(self.driver, 40, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -458,13 +331,12 @@ class Download(object):
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
                 time.sleep(random.randint(5, 9))
-            except Exception as e:
-                print(e)
 
-            # click payments
-            try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[2]/a'))).click()
+
+                # click payments
+                js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(2) > a').click();"
+                self.driver.execute_script(js_click_payments)
+
                 logger.info('click payments')
                 time.sleep(random.randint(4, 7))
                 break
@@ -497,6 +369,7 @@ class Download(object):
             start.click()
             three_days_ago = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
             start.send_keys(three_days_ago)
+            time.sleep(random.randint(3, 7))
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
@@ -514,7 +387,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('select date')
-        time.sleep(random.randint(30, 60))
+        time.sleep(random.randint(10, 20))
         self.scroll_down()
         self.driver.refresh()
         time.sleep(random.randint(10, 20))
@@ -550,8 +423,9 @@ class Download(object):
 
             # click fulfillments
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[5]/a'))).click()
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+                self.driver.execute_script(js_click_fulfillments)
+
                 logger.info('click fulfillments')
                 time.sleep(random.randint(4, 7))
                 break
@@ -602,7 +476,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('downloading')
-        time.sleep(random.randint(1, 7))
+        time.sleep(random.randint(20, 50))
 
         try:
             download_link = download_button.get_attribute("href")
@@ -629,8 +503,8 @@ class Download(object):
 
             # click advertising reports
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
                 logger.info('click advertising reports')
                 time.sleep(random.randint(4, 7))
                 break
@@ -644,6 +518,7 @@ class Download(object):
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.XPATH,
                                                 '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[1]/div[2]/span/span'))).click()
+            time.sleep(random.randint(4, 7))
 
             # click daily
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -658,6 +533,7 @@ class Download(object):
             # click drop down
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[2]/span/span'))).click()
+            time.sleep(random.randint(4, 7))
 
             # click daily
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -667,6 +543,25 @@ class Download(object):
         logger.info('choose daily')
         time.sleep(random.randint(4, 7))
 
+        # select date
+        try:
+
+            # click drop down
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH,
+                                                '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[1]/div/div/span/span'))).click()
+            time.sleep(random.randint(4, 7))
+
+            js = "document.querySelector('#a-popover-3 > div > div > ul > li:nth-child(3) > a').click();"
+            self.driver.execute_script(js)
+            logger.info('click drop down')
+
+            time.sleep(random.randint(4, 7))
+        except Exception as e:
+            print(e)
+        logger.info('select date')
+        time.sleep(random.randint(4, 7))
+
         # click create report
         try:
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -674,7 +569,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click create report')
-        time.sleep(random.randint(4, 7))
+        time.sleep(random.randint(20, 30))
 
         # click download
         try:
@@ -684,7 +579,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click download')
-        time.sleep(random.randint(4, 7))
+        time.sleep(random.randint(10, 20))
 
         dir_list = os.listdir(os.path.expanduser('~/Downloads/'))
         dir_list = sorted(dir_list, key=lambda x: os.path.getmtime(os.path.join(os.path.expanduser('~/Downloads/'), x)))
@@ -707,8 +602,8 @@ class Download(object):
 
             # click advertising reports
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
                 logger.info('click advertising reports')
                 time.sleep(random.randint(4, 7))
                 break
@@ -720,6 +615,7 @@ class Download(object):
             # click drop down
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[2]/span/span'))).click()
+            time.sleep(random.randint(4, 7))
 
             # click daily
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -729,6 +625,26 @@ class Download(object):
         logger.info('choose daily')
         time.sleep(random.randint(4, 7))
 
+        # select week to date
+        try:
+
+            # select week to date
+            WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.XPATH,
+                                                '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[1]/div/div/span/span/span'))).click()
+            time.sleep(random.randint(4, 7))
+
+            js = "document.querySelector('#a-popover-2 > div > div > ul > li:nth-child(3) > a').click();"
+            self.driver.execute_script(js)
+            logger.info('select week to date')
+
+
+            time.sleep(random.randint(4, 7))
+        except Exception as e:
+            print(e)
+        logger.info('select date')
+        time.sleep(random.randint(4, 7))
+
         # click create report
         try:
             WebDriverWait(self.driver, 40, 0.5).until(
@@ -736,7 +652,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click create report')
-        time.sleep(random.randint(4, 7))
+        time.sleep(random.randint(20, 40))
 
         # click download
         try:
@@ -746,7 +662,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click download')
-        time.sleep(random.randint(4, 7))
+        time.sleep(random.randint(20, 30))
 
         dir_list = os.listdir(os.path.expanduser('~/Downloads/'))
         dir_list = sorted(dir_list, key=lambda x: os.path.getmtime(os.path.join(os.path.expanduser('~/Downloads/'), x)))
@@ -770,8 +686,8 @@ class Download(object):
 
             # click advertising reports
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[6]'))).click()
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
                 logger.info('click advertising reports')
                 time.sleep(random.randint(4, 7))
                 break
@@ -802,14 +718,14 @@ class Download(object):
         while True:
             try:
                 self.driver.refresh()
-                time.sleep(random.randint(5, 15))
+                time.sleep(random.randint(10, 25))
                 try:
                     download_button = WebDriverWait(self.driver, 3, 0.5).until(
                         EC.presence_of_element_located(
                             (By.XPATH, '//*[@id="downloadHistoryId"]/tbody/tr[2]/td[2]/div/a')))
                     download_button.click()
                     logger.info('click download')
-                    time.sleep(random.randint(4, 7))
+                    time.sleep(random.randint(20, 50))
 
                     # sort by get time return the latest one
 
@@ -837,8 +753,8 @@ class Download(object):
 
             # click business reports
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/ul/li[4]'))).click()
+                js_click_business_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(4) > a').click();"
+                self.driver.execute_script(js_click_business_reports)
                 logger.info('click business reports')
                 time.sleep(random.randint(4, 7))
                 break
@@ -871,8 +787,8 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('choose csv')
-        time.sleep(random.randint(4, 7))
-        return 'BusinessReport-' + datetime.datetime.utcnow().date().strftime("%m-%d-%y") + '.csv'
+        time.sleep(random.randint(20, 50))
+        return 'BusinessReport-' + datetime.date.today().strftime("%m-%d-%y") + '.csv'
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
 
@@ -1125,23 +1041,3 @@ class Download(object):
 
     def close_webdriver(self):
         self.driver.quit()
-
-class MultiCronTrigger(BaseTrigger):
-
-    triggers = []
-
-    def __init__(self, triggers):
-        self.triggers = triggers
-
-    def get_next_fire_time(self, previous_fire_time, now):
-        min_next_fire_time = None
-        for trigger in self.triggers:
-            # 从trigger对象中取出下一个要执行的时间点，与当前时间对比
-            next_fire_time = trigger.get_next_fire_time(previous_fire_time, now)
-            if next_fire_time is None:
-                continue
-            if min_next_fire_time is None:
-                min_next_fire_time = next_fire_time
-            if next_fire_time < min_next_fire_time:
-                min_next_fire_time = next_fire_time
-        return min_next_fire_time
