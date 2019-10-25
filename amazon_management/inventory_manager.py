@@ -495,12 +495,12 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            three_days_ago = (datetime.datetime.utcnow().date() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
+            three_days_ago = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
             start.send_keys(three_days_ago)
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
             end.send_keys(yesterday)
         except Exception as e:
             print(e)
