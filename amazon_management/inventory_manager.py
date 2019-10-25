@@ -569,7 +569,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click create report')
-        time.sleep(random.randint(20, 30))
+        time.sleep(random.randint(30, 60))
 
         # click download
         try:
@@ -652,7 +652,7 @@ class Download(object):
         except Exception as e:
             print(e)
         logger.info('click create report')
-        time.sleep(random.randint(20, 40))
+        time.sleep(random.randint(30, 60))
 
         # click download
         try:
