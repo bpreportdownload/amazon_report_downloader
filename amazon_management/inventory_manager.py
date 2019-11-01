@@ -3,7 +3,6 @@ import random
 import re
 import os
 import datetime
-from apscheduler.triggers.base import BaseTrigger
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -109,6 +108,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, 'a-autoid-0-announce'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click Report Type drop down')
         time.sleep(random.randint(4, 7))
 
@@ -118,6 +118,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, 'dropdown1_7'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click all listing report')
         time.sleep(random.randint(4, 7))
 
@@ -127,6 +128,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="a-autoid-5"]/span/input'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click request report button')
         time.sleep(random.randint(4, 7))
 
@@ -149,6 +151,7 @@ class Download(object):
                 break
             except Exception as e:
                 print(e)
+                self.driver.quit()
         logger.info('All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt")
         time.sleep(random.randint(20, 50))
         return 'All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt"
@@ -190,6 +193,7 @@ class Download(object):
             WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'FlatFileAllOrdersReport'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click all orders')
         time.sleep(random.randint(1, 7))
 
@@ -198,6 +202,7 @@ class Download(object):
             WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'eventDateType'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         time.sleep(random.randint(1, 7))
 
         # select Last Updated Date
@@ -205,6 +210,7 @@ class Download(object):
             WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="eventDateType"]/select/option[2]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose Last Updated Date')
         time.sleep(random.randint(1, 7))
 
@@ -213,34 +219,31 @@ class Download(object):
             WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('download request')
         time.sleep(random.randint(1, 7))
 
-        while True:
+
+        try:
+            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
+            logger.info('downloading')
+            time.sleep(random.randint(20, 50))
+            download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
+            # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
+            logger.info("download_button")
             try:
-                WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
-                logger.info('downloading')
-                time.sleep(random.randint(20, 50))
-                download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
-                # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
-                logger.info("download_button")
-                try:
 
-                    download_link = download_button.get_attribute("href")
+                download_link = download_button.get_attribute("href")
 
-                    logger.info(download_link)
-                    orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
-                    logger.info(orders_name)
-                    return orders_name + '.txt'
-                except Exception as e:
-                    print(e)
-            except StaleElementReferenceException:
-                pass
-            except (NoSuchElementException, TimeoutException):
-                break
-            except:
-                raise RuntimeError(
-                    'Could not find total product pages element - %s' % self.selectors['total_product_pages_selector'])
+                logger.info(download_link)
+                orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+                logger.info(orders_name)
+                return orders_name + '.txt'
+            except Exception as e:
+                print(e)
+        except Exception as e:
+            print(e)
+            self.driver.quit()
 
     def go_to_FBA_shipment_download_page(self):
         # 移动鼠标到reports
@@ -272,6 +275,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, 'AFNShipmentReport'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click Amazon Fulfilled Shipments')
         time.sleep(random.randint(1, 7))
 
@@ -281,6 +285,7 @@ class Download(object):
                 EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click event date drop down')
         time.sleep(random.randint(1, 7))
 
@@ -290,6 +295,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child(2)'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose yesterday')
         time.sleep(random.randint(1, 7))
 
@@ -298,15 +304,17 @@ class Download(object):
             WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click  Request .txt Download')
         time.sleep(random.randint(1, 7))
         # click download
         try:
-            download_button = WebDriverWait(self.driver, 40, 0.5).until(
+            download_button = WebDriverWait(self.driver, 80, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[5]/a')))
             download_button.click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('downloading')
         time.sleep(random.randint(20, 50))
 
@@ -318,6 +326,7 @@ class Download(object):
             return FBA_shippment_name + '.txt'
         except Exception as e:
             print(e)
+            self.driver.quit()
 
 
     def go_to_finance_download_page(self):
@@ -350,6 +359,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#PaymentTabs > div > ul > li:nth-child(4)'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click data range report')
         time.sleep(random.randint(4, 7))
 
@@ -359,6 +369,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportButton'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click data range report')
         time.sleep(random.randint(4, 7))
 
@@ -367,16 +378,17 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            three_days_ago = (datetime.date.today() - datetime.timedelta(days=3)).strftime("%m/%d/%Y")
+            three_days_ago = (datetime.date.today() - datetime.timedelta(days=random.randint(3, 7))).strftime("%m/%d/%Y")
             start.send_keys(three_days_ago)
             time.sleep(random.randint(3, 7))
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            yesterday = (datetime.date.today() - datetime.timedelta(days=random.randint(1, 2))).strftime("%m/%d/%Y")
             end.send_keys(yesterday)
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('select date')
         time.sleep(random.randint(4, 7))
 
@@ -386,6 +398,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('select date')
         time.sleep(random.randint(10, 20))
         self.scroll_down()
@@ -406,6 +419,7 @@ class Download(object):
             return bulk_report + '.csv'
         except Exception as e:
             print(e)
+            self.driver.quit()
 
     def go_to_FBA_inventory_download_page(self):
 
@@ -458,6 +472,7 @@ class Download(object):
             time.sleep(random.randint(5, 9))
         except Exception as e:
             print(e)
+            self.driver.quit()
 
         # click Request .txt Download
         try:
@@ -465,6 +480,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('Request .txt Download')
         time.sleep(random.randint(20, 40))
 
@@ -475,6 +491,7 @@ class Download(object):
             download_button.click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('downloading')
         time.sleep(random.randint(20, 50))
 
@@ -486,6 +503,7 @@ class Download(object):
             return FBA_inventory + '.txt'
         except Exception as e:
             print(e)
+            self.driver.quit()
 
     def go_to_advertising_reports_download_page(self):
 
@@ -525,6 +543,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown1_2"]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose Advertised product')
         time.sleep(random.randint(4, 7))
 
@@ -540,6 +559,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown2_1"]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose daily')
         time.sleep(random.randint(4, 7))
 
@@ -552,13 +572,15 @@ class Download(object):
                                                 '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[2]/div[2]/div[1]/div/div/span/span'))).click()
             time.sleep(random.randint(4, 7))
 
-            js = "document.querySelector('#a-popover-3 > div > div > ul > li:nth-child(3) > a').click();"
+            js = "document.querySelector('#a-popover-3 > div > div > ul > li:nth-child(%s) > a').click();" % random.randint(1, 5)
+            logger.info(js)
             self.driver.execute_script(js)
             logger.info('click drop down')
 
             time.sleep(random.randint(4, 7))
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('select date')
         time.sleep(random.randint(4, 7))
 
@@ -568,6 +590,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[1]/span/span/input'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click create report')
         time.sleep(random.randint(30, 60))
 
@@ -578,6 +601,7 @@ class Download(object):
                     (By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[2]/div/div[5]/span/span/a'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click download')
         time.sleep(random.randint(10, 20))
 
@@ -622,6 +646,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="dropdown1_1"]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose daily')
         time.sleep(random.randint(4, 7))
 
@@ -642,6 +667,7 @@ class Download(object):
             time.sleep(random.randint(4, 7))
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('select date')
         time.sleep(random.randint(4, 7))
 
@@ -651,6 +677,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/section/div[1]/span/span/input'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click create report')
         time.sleep(random.randint(30, 60))
 
@@ -661,6 +688,7 @@ class Download(object):
                     (By.XPATH, '//*[@id="tresah"]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div[3]/div/div/div/div[2]/div/div[5]/span/span/a'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click download')
         time.sleep(random.randint(20, 30))
 
@@ -701,6 +729,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="tresah"]/div/div/div[1]/nav/ul/a[3]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click bulk operations')
         time.sleep(random.randint(4, 7))
 
@@ -710,6 +739,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="request-entity-report-submit"]/span/input'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click create spreadsheet for download')
         time.sleep(random.randint(4, 7))
         self.scroll_down()
@@ -768,6 +798,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="report_DetailSalesTrafficBySKU"]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click detail page sales and traffic')
         time.sleep(random.randint(4, 7))
 
@@ -777,6 +808,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="export"]/div'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('click download drop down')
         time.sleep(random.randint(4, 7))
 
@@ -786,6 +818,7 @@ class Download(object):
                 EC.presence_of_element_located((By.XPATH, '//*[@id="downloadCSV"]'))).click()
         except Exception as e:
             print(e)
+            self.driver.quit()
         logger.info('choose csv')
         time.sleep(random.randint(20, 50))
         return 'BusinessReport-' + datetime.date.today().strftime("%m-%d-%y") + '.csv'
@@ -1038,6 +1071,7 @@ class Download(object):
             os.remove(file_path)
         except Exception as e:
             print(e)
+            self.driver.quit()
 
     def close_webdriver(self):
         self.driver.quit()
