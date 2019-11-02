@@ -820,12 +820,17 @@ class Download(object):
             print(e)
             self.driver.quit()
         logger.info('choose csv')
-        time.sleep(random.randint(20, 50))
-        year = str(int(datetime.date.today().strftime('%y')))
-        month = str(int(datetime.date.today().strftime('%m')))
-        day = str(int(datetime.date.today().strftime('%d')))
-        year + '-' + month + '-' + day
-        return 'BusinessReport-' + month + day + year + '.csv'
+        try:
+            time.sleep(random.randint(10, 50))
+            year = str(int(datetime.date.today().strftime('%y')))
+            month = str(int(datetime.date.today().strftime('%m')))
+            day = str(int(datetime.date.today().strftime('%d')))
+            file_name = 'BusinessReport-' + month + '-' + day + '-' + year + '.csv'
+            logger.info(file_name)
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        return file_name
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
 

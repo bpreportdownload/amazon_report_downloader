@@ -132,6 +132,7 @@ def download_report(report):
             if report == "business_report":
                 try:
                     file_name = downloader.go_to_business_report_download()
+                    logger.info(file_name)
                     downloader.upload_files("https://300gideon.com/import_business", file_name, gideon_email,
                                                           gideon_password, seller_id, "business_file", marketplace)
 
