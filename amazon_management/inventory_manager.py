@@ -92,7 +92,7 @@ class Download(object):
 
             # click inventory reports
             try:
-                js_click_inventory_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(7) > a').click();"
+                js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child(7) > a').click();"
                 self.driver.execute_script(js_click_inventory_reports)
 
                 logger.info('click inventory reports')
@@ -821,7 +821,11 @@ class Download(object):
             self.driver.quit()
         logger.info('choose csv')
         time.sleep(random.randint(20, 50))
-        return 'BusinessReport-' + datetime.date.today().strftime("%m-%d-%y") + '.csv'
+        year = str(int(datetime.date.today().strftime('%y')))
+        month = str(int(datetime.date.today().strftime('%m')))
+        day = str(int(datetime.date.today().strftime('%d')))
+        year + '-' + month + '-' + day
+        return 'BusinessReport-' + month + day + year + '.csv'
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
 
