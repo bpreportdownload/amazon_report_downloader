@@ -9,13 +9,11 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import (
-    TimeoutException, NoSuchElementException, WebDriverException,
-    StaleElementReferenceException)
+from selenium.common.exceptions import (TimeoutException, NoSuchElementException)
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.keys import Keys
 
-from amazon_management import MARKETPLACE_MAPPING
+from amazon_reports_downloader import MARKETPLACE_MAPPING
 
 
 class SellerLoginHelper(object):

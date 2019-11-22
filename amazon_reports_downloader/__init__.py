@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 from sentry_sdk import capture_message
 
-from amazon_management.signals import (
+from amazon_reports_downloader.signals import (
     get_shipping_fee_failure,
     pick_marketplace_failure,
     choose_template_failure,

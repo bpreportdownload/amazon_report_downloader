@@ -16,7 +16,7 @@ try:
 except:
     long_description = ''
 
-with open(path.join(here, 'amazon_management', 'VERSION'), 'rb') as f:
+with open(path.join(here, 'amazon_reports_downloader', 'VERSION'), 'rb') as f:
     version = f.read().decode('ascii').strip()
 
 with open(path.join(here, 'requirements.txt')) as f:
@@ -27,7 +27,7 @@ with open(path.join(here, 'requirements.txt')) as f:
             requirements.append(line)
 
 setup(
-    name='amazon_management',
+    name='amazon_reports_downloader',
     version=version,
     description='Amazon seller management tool.',
     long_description=long_description,
@@ -60,11 +60,11 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'upload=amazon_management.bin.upload_files:upload',
-            'download_report=amazon_management.bin.download_report:download_report',
-            'clear_inv_by_sku=amazon_management.bin.clear_inv_by_sku:clear_inv_by_sku',
-            'update_shipping_price=amazon_management.bin.update_shipping_price:update_shipping_price',
-            'generate_financial_transactions=amazon_management.bin.generate_financial_transactions:request_report'
+            'upload=amazon_reports_downloader.bin.upload_files:upload',
+            'download_report=amazon_reports_downloader.bin.download_report:download_report',
+            'clear_inv_by_sku=amazon_reports_downloader.bin.clear_inv_by_sku:clear_inv_by_sku',
+            'update_shipping_price=amazon_reports_downloader.bin.update_shipping_price:update_shipping_price',
+            'generate_financial_transactions=amazon_reports_downloader.bin.generate_financial_transactions:request_report'
         ]
     }
 )

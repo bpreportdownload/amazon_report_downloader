@@ -13,7 +13,7 @@ from selenium.common.exceptions import (
 
 from selenium.webdriver.support.select import Select
 from selenium import webdriver
-from amazon_management import logger
+from amazon_reports_downloader import logger
 
 class Download(object):
     def __init__(self, driver):
@@ -214,6 +214,26 @@ class Download(object):
         logger.info('choose Last Updated Date')
         time.sleep(random.randint(1, 7))
 
+        # click last date drop down
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        time.sleep(random.randint(1, 7))
+
+        # select Last Updated Date
+        try:
+            pt = '//*[@id="downloadDateDropdown"]/option[{}]'.format(random.randint(2, 3))
+            logger.info(pt)
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, pt))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        logger.info('choose 3/7 Date')
+        time.sleep(random.randint(1, 7))
+
         # click download
         try:
             WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
@@ -225,7 +245,7 @@ class Download(object):
 
 
         try:
-            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
+            WebDriverWait(self.driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
             download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
@@ -289,19 +309,19 @@ class Download(object):
         logger.info('click event date drop down')
         time.sleep(random.randint(1, 7))
 
-        # choose yesterday
+        # choose date range
         try:
             WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child(2)'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child({})'.format(random.randint(3, 5))))).click()
         except Exception as e:
             print(e)
             self.driver.quit()
-        logger.info('choose yesterday')
+        logger.info('date range')
         time.sleep(random.randint(1, 7))
 
         # click  Request .txt Download
         try:
-            WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
+            WebDriverWait(self.driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
         except Exception as e:
             print(e)
             self.driver.quit()

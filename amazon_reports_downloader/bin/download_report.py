@@ -4,10 +4,10 @@ import sys
 import time
 import click
 
-from amazon_management import logger, get_shared_driver, MARKETPLACE_MAPPING
-from amazon_management.utils import YamlConfigLoader
-from amazon_management.helpers import SellerLoginHelper
-from amazon_management.inventory_manager import Download
+from amazon_reports_downloader import logger, get_shared_driver, MARKETPLACE_MAPPING
+from amazon_reports_downloader.utils import YamlConfigLoader
+from amazon_reports_downloader.helpers import SellerLoginHelper
+from amazon_reports_downloader.inventory_manager import Download
 
 
 
@@ -15,7 +15,7 @@ from amazon_management.inventory_manager import Download
 @click.option('-c', '--report', help='[1.order_report 2.FBA_shipment_report 3.finance_report 4.advertising_report 5.campaigns_bulk_report 6.advertising_search_term_report 7.listings_report 8.FBA_inventory_report 9.business_report]')
 def download_report(report):
     logger.info(report)
-    config_path = './amazon_management/inventory_download.yml'
+    config_path = './amazon_reports_downloader/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
         logger.error('Could not find configuration file - %s', config_path)
