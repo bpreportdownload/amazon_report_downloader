@@ -85,8 +85,21 @@ class SellerLoginHelper(object):
                 EC.presence_of_element_located((By.XPATH, picker_xpath)))
             picker_elem = Select(picker_elem)
             cur_marketplace = picker_elem.first_selected_option.text.strip()
+
+            # get store name
+
+            store_ele = self.driver.find_element_by_xpath('//*[@id="sc-mkt-picker-switcher-select"]/optgroup')
+            store_name = store_ele.get_attribute('label')
+
             if cur_marketplace != marketplace_domain: #当前卖场和文件的卖场不同如何处理
-                picker_elem.select_by_visible_text(marketplace_domain)
+                try:
+                    print('switch market place')
+                    if marketplace_domain == 'www.amazon.com':
+                        picker_elem.select_by_visible_text(marketplace_domain + ' ' + '-' + ' ' + store_name)
+                    else:
+                        picker_elem.select_by_visible_text(marketplace_domain)
+                except Exception as e:
+                    print(e)
 
             WebDriverWait(self.driver, 3).until(
                 EC.element_located_to_be_selected((By.XPATH, target_xpath)))

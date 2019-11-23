@@ -35,9 +35,11 @@ def download_report(report):
         helper = SellerLoginHelper(driver, email, password, marketplace)
         downloader = Download(driver)
 
-        inventory_url_template = 'https://{}/inventory?tbla_myitable=sort:%7B"sortOrder"%3A"DESCENDING"%2C"sortedColumnId"%3A"date"%7D;search:'
-        inventory_url = inventory_url_template.format(MARKETPLACE_MAPPING.get(marketplace)['sellercentral'])
-        driver.get(inventory_url)
+        seller_central_url = 'https://sellercentral.amazon.com/home'
+
+        # inventory_url_template = 'https://{}/inventory?tbla_myitable=sort:%7B"sortOrder"%3A"DESCENDING"%2C"sortedColumnId"%3A"date"%7D;search:'
+        # inventory_url = inventory_url_template.format(MARKETPLACE_MAPPING.get(marketplace)['sellercentral'])
+        driver.get(seller_central_url)
         while helper.is_login_required():
             logger.info('Login required! Trying to login...')
 
@@ -58,8 +60,8 @@ def download_report(report):
 
             time.sleep(7)
 
-            driver.get(inventory_url)
-
+            driver.get(seller_central_url)
+        logger.info('begin to pick marketplace')
         helper.pick_marketplace()
         logger.info('Picked marketplace!')
 
@@ -71,6 +73,13 @@ def download_report(report):
             if report == "order_report":
                 try:
                     file_name = downloader.go_to_orders_download_page()
+                    downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "orders_file", marketplace)
+                except Exception as e:
+                    print(e)
+
+            if report == "order_report_today":
+                try:
+                    file_name = downloader.go_to_today_orders_download_page()
                     downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "orders_file", marketplace)
                 except Exception as e:
                     print(e)

@@ -163,6 +163,126 @@ class Download(object):
         except:
             pass
 
+    def go_to_today_orders_download_page(self):
+
+        # 移动鼠标到reports
+        for i in range(0, 3):
+            try:
+                reports = WebDriverWait(self.driver, 20, 0.5).until(
+                    EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+                time.sleep(random.randint(4, 7))
+                webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+                logger.info('go to reports')
+                time.sleep(random.randint(7, 9))
+            except Exception as e:
+                print(e)
+
+            # click fulfillments
+            try:
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+                self.driver.execute_script(js_click_fulfillments)
+                logger.info('click fulfillments')
+                time.sleep(random.randint(1, 7))
+                break
+            except Exception as e:
+                print(e)
+
+        # click all orders
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'FlatFileAllOrdersReport'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        logger.info('click all orders')
+        time.sleep(random.randint(1, 7))
+
+        # click order date drop down
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'eventDateType'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        time.sleep(random.randint(1, 7))
+
+        # select Last Updated Date
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="eventDateType"]/select/option[2]'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        logger.info('choose Last Updated Date')
+        time.sleep(random.randint(1, 7))
+
+        # click last date drop down
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        time.sleep(random.randint(1, 7))
+
+        # select Exact Date
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadDateDropdown"]/option[6]'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        time.sleep(random.randint(1, 7))
+
+        # From today to today
+        try:
+            from_elem = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
+            from_elem.click()
+            today = datetime.date.today().strftime("%m/%d/%y")
+            from_elem.send_keys(today)
+            time.sleep(random.randint(3, 7))
+            to_elem = WebDriverWait(self.driver, 40, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#toDateDownload')))
+            to_elem.click()
+            to_elem.send_keys(today)
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        logger.info('select today')
+        time.sleep(random.randint(4, 7))
+
+        # click download
+        try:
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        logger.info('download request')
+        time.sleep(random.randint(1, 7))
+
+        try:
+            WebDriverWait(self.driver, 60, 0.5).until(EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
+            logger.info('downloading')
+            time.sleep(random.randint(20, 50))
+            download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
+            # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
+            logger.info("download_button")
+            try:
+
+                download_link = download_button.get_attribute("href")
+
+                logger.info(download_link)
+                orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+                logger.info(orders_name)
+                return orders_name + '.txt'
+            except Exception as e:
+                print(e)
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+
 
     def go_to_orders_download_page(self):
 
