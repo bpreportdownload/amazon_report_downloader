@@ -518,13 +518,13 @@ class Download(object):
             start = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            three_days_ago = (datetime.date.today() - datetime.timedelta(days=random.randint(3, 7))).strftime("%m/%d/%Y")
-            start.send_keys(three_days_ago)
+            seven_days_ago = (datetime.date.today() - datetime.timedelta(days=random.randint(7, 10))).strftime("%m/%d/%Y")
+            start.send_keys(seven_days_ago)
             time.sleep(random.randint(3, 7))
             end = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.date.today() - datetime.timedelta(days=random.randint(1, 2))).strftime("%m/%d/%Y")
+            yesterday = datetime.date.today().strftime("%m/%d/%Y")
             end.send_keys(yesterday)
         except Exception as e:
             print(e)
@@ -1214,7 +1214,7 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
 
         try:
-            time.sleep(random.randint(1, 5))
+            time.sleep(random.randint(20, 30))
             self.driver.close()
             self.driver.switch_to_window(handles[0])
             os.remove(file_path)
