@@ -239,11 +239,15 @@ class Download(object):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
             from_elem.click()
             today = datetime.date.today().strftime("%m/%d/%y")
+            from_elem.clear()
+            time.sleep(random.randint(1, 7))
             from_elem.send_keys(today)
             time.sleep(random.randint(3, 7))
             to_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#toDateDownload')))
             to_elem.click()
+            to_elem.clear()
+            to_elem.sleep(random.randint(1, 7))
             to_elem.send_keys(today)
         except Exception as e:
             print(e)
@@ -543,7 +547,7 @@ class Download(object):
         time.sleep(random.randint(10, 20))
         self.scroll_down()
         self.driver.refresh()
-        time.sleep(random.randint(10, 20))
+        time.sleep(random.randint(20, 30))
         # click download
         try:
             download_button = WebDriverWait(self.driver, 900, 0.5).until(
