@@ -237,17 +237,18 @@ class Download(object):
         try:
             from_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
-            from_elem.click()
-            today = datetime.date.today().strftime("%m/%d/%y")
-            from_elem.clear()
+            today = datetime.date.today().strftime("%m/%d/%Y")
             time.sleep(random.randint(1, 7))
+            for i in range(0, 30):
+                from_elem.send_keys('\b')
             from_elem.send_keys(today)
+            logger.info(from_elem.get_attribute('value'))
             time.sleep(random.randint(3, 7))
             to_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#toDateDownload')))
-            to_elem.click()
-            to_elem.clear()
-            to_elem.sleep(random.randint(1, 7))
+            for i in range(0, 30):
+                to_elem.send_keys('\b')
+            time.sleep(random.randint(1, 7))
             to_elem.send_keys(today)
         except Exception as e:
             print(e)
