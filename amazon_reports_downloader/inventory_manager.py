@@ -7,9 +7,7 @@ import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import (
-    TimeoutException, NoSuchElementException, WebDriverException,
-    StaleElementReferenceException)
+
 
 from selenium.webdriver.support.select import Select
 from selenium import webdriver
@@ -179,13 +177,23 @@ class Download(object):
 
             # click fulfillments
             try:
-                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+
+                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Fulfillment")]", document, null, XPathResult.ANY_TYPE, null).click();'
                 self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
                 time.sleep(random.randint(1, 7))
                 break
             except Exception as e:
                 print(e)
+            # click fulfillments
+            # try:
+            #     js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
+            #     self.driver.execute_script(js_click_fulfillments)
+            #     logger.info('click fulfillments')
+            #     time.sleep(random.randint(1, 7))
+            #     break
+            # except Exception as e:
+            #     print(e)
 
         # click all orders
         try:
@@ -258,7 +266,7 @@ class Download(object):
 
         # click download
         try:
-            WebDriverWait(self.driver, 20, 0.5).until(
+            WebDriverWait(self.driver, 120, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
         except Exception as e:
             print(e)
@@ -361,7 +369,7 @@ class Download(object):
 
         # click download
         try:
-            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
+            WebDriverWait(self.driver, 120, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
         except Exception as e:
             print(e)
             self.driver.quit()

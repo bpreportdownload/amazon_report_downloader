@@ -95,7 +95,8 @@ class SellerLoginHelper(object):
                 try:
                     print('switch market place')
                     if marketplace_domain == 'www.amazon.com':
-                        picker_elem.select_by_visible_text(marketplace_domain + ' ' + '-' + ' ' + store_name)
+                        # picker_elem.select_by_visible_text(marketplace_domain + ' ' + '-' + ' ' + store_name)
+                        picker_elem.select_by_visible_text(marketplace_domain)
                     else:
                         picker_elem.select_by_visible_text(marketplace_domain)
                 except Exception as e:

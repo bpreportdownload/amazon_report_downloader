@@ -3,10 +3,9 @@ import sys
 from sys import platform
 import logging
 
-from pydispatch import dispatcher
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
-from sentry_sdk import capture_message
+
 
 from amazon_reports_downloader.signals import (
     get_shipping_fee_failure,
@@ -132,10 +131,3 @@ stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
-
-dispatcher.connect(capture_message, get_shipping_fee_failure)
-dispatcher.connect(capture_message, pick_marketplace_failure)
-dispatcher.connect(capture_message, choose_template_failure)
-dispatcher.connect(capture_message, change_shipping_price_failure)
-dispatcher.connect(capture_message, trigger_report_request_failure)
-dispatcher.connect(capture_message, generate_report_failure)
