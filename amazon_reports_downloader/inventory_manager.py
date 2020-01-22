@@ -90,25 +90,14 @@ class Download(object):
 
             # click inventory reports
             try:
+                js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child(7) > a').click();"
+                self.driver.execute_script(js_click_inventory_reports)
 
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Inventory Reports")]", document, null, XPathResult.ANY_TYPE, null).click();'
-                self.driver.execute_script(js_click_fulfillments)
                 logger.info('click inventory reports')
-                time.sleep(random.randint(1, 7))
+                time.sleep(random.randint(4, 7))
                 break
             except Exception as e:
                 print(e)
-
-            # click inventory reports
-            # try:
-            #     js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child(7) > a').click();"
-            #     self.driver.execute_script(js_click_inventory_reports)
-            #
-            #     logger.info('click inventory reports')
-            #     time.sleep(random.randint(4, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
 
         # click Report Type drop down
@@ -188,23 +177,13 @@ class Download(object):
 
             # click fulfillments
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Fulfillment")]", document, null, XPathResult.ANY_TYPE, null).click();'
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
                 self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
                 time.sleep(random.randint(1, 7))
                 break
             except Exception as e:
                 print(e)
-            # click fulfillments
-            # try:
-            #     js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
-            #     self.driver.execute_script(js_click_fulfillments)
-            #     logger.info('click fulfillments')
-            #     time.sleep(random.randint(1, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
         # click all orders
         try:
@@ -323,24 +302,13 @@ class Download(object):
 
             # click fulfillments
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Fulfillment")]", document, null, XPathResult.ANY_TYPE, null).click();'
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
                 self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
                 time.sleep(random.randint(1, 7))
                 break
             except Exception as e:
                 print(e)
-
-            # click fulfillments
-            # try:
-            #     js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
-            #     self.driver.execute_script(js_click_fulfillments)
-            #     logger.info('click fulfillments')
-            #     time.sleep(random.randint(1, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
 
         # click all orders
@@ -435,24 +403,13 @@ class Download(object):
 
             # click fulfillments
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Fulfillment")]", document, null, XPathResult.ANY_TYPE, null).click();'
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
                 self.driver.execute_script(js_click_fulfillments)
                 logger.info('click fulfillments')
-                time.sleep(random.randint(1, 7))
+                time.sleep(random.randint(4, 7))
                 break
             except Exception as e:
                 print(e)
-
-            # click fulfillments
-            # try:
-            #     js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
-            #     self.driver.execute_script(js_click_fulfillments)
-            #     logger.info('click fulfillments')
-            #     time.sleep(random.randint(4, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
 
         # click Amazon Fulfilled Shipments
@@ -527,23 +484,13 @@ class Download(object):
                 logger.info('go to reports')
                 time.sleep(random.randint(5, 9))
 
-                # click Payments
-                try:
-                    js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Payments")]", document, null, XPathResult.ANY_TYPE, null).click();'
-                    self.driver.execute_script(js_click_fulfillments)
-                    logger.info('click Payments')
-                    time.sleep(random.randint(1, 7))
-                    break
-                except Exception as e:
-                    print(e)
-
                 # click payments
-                # js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(2) > a').click();"
-                # self.driver.execute_script(js_click_payments)
-                #
-                # logger.info('click payments')
-                # time.sleep(random.randint(4, 7))
-                # break
+                js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(2) > a').click();"
+                self.driver.execute_script(js_click_payments)
+
+                logger.info('click payments')
+                time.sleep(random.randint(4, 7))
+                break
             except Exception as e:
                 print(e)
 
@@ -632,25 +579,14 @@ class Download(object):
 
             # click fulfillments
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Fulfillment")]", document, null, XPathResult.ANY_TYPE, null).click();'
+                js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
                 self.driver.execute_script(js_click_fulfillments)
+
                 logger.info('click fulfillments')
-                time.sleep(random.randint(1, 7))
+                time.sleep(random.randint(4, 7))
                 break
             except Exception as e:
                 print(e)
-
-            # click fulfillments
-            # try:
-            #     js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(5) > a').click();"
-            #     self.driver.execute_script(js_click_fulfillments)
-            #
-            #     logger.info('click fulfillments')
-            #     time.sleep(random.randint(4, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
 
         # click inventory show more
@@ -725,26 +661,15 @@ class Download(object):
             except Exception as e:
                 print(e)
 
-            # click Advertising Reports
+            # click advertising reports
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Advertising Reports")]", document, null, XPathResult.ANY_TYPE, null).click();'
-                self.driver.execute_script(js_click_fulfillments)
-                logger.info('click Advertising Reports')
-                time.sleep(random.randint(1, 7))
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
+                logger.info('click advertising reports')
+                time.sleep(random.randint(4, 7))
                 break
             except Exception as e:
                 print(e)
-
-            # click advertising reports
-            # try:
-            #     js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
-            #     self.driver.execute_script(js_click_advertising_reports)
-            #     logger.info('click advertising reports')
-            #     time.sleep(random.randint(4, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
 
         # choose Advertised product
@@ -829,27 +754,15 @@ class Download(object):
             except Exception as e:
                 print(e)
 
-            # click Advertising Reports
+            # click advertising reports
             try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Advertising Reports")]", document, null, XPathResult.ANY_TYPE, null).click();'
-                self.driver.execute_script(js_click_fulfillments)
-                logger.info('click Advertising Reports')
-                time.sleep(random.randint(1, 7))
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
+                logger.info('click advertising reports')
+                time.sleep(random.randint(4, 7))
                 break
             except Exception as e:
                 print(e)
-
-
-            # click advertising reports
-            # try:
-            #     js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
-            #     self.driver.execute_script(js_click_advertising_reports)
-            #     logger.info('click advertising reports')
-            #     time.sleep(random.randint(4, 7))
-            #     break
-            # except Exception as e:
-            #     print(e)
 
         # choose daily
         try:
@@ -929,16 +842,6 @@ class Download(object):
             except Exception as e:
                 print(e)
 
-            # click Advertising Reports
-            try:
-
-                js_click_fulfillments = 'headings = document.evaluate("//a[contains(., "Advertising Reports")]", document, null, XPathResult.ANY_TYPE, null).click();'
-                self.driver.execute_script(js_click_fulfillments)
-                logger.info('click Advertising Reports')
-                time.sleep(random.randint(1, 7))
-                break
-            except Exception as e:
-                print(e)
             # click advertising reports
             try:
                 js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
