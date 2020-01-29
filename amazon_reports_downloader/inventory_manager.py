@@ -677,18 +677,21 @@ class Download(object):
             # click drop down
             WebDriverWait(self.driver, 940, 0.5).until(
                 EC.presence_of_element_located((By.XPATH,
-                                                '//*[@id="tresah"]/div/div/div[2]/div[3]/section/div[2]/div[1]/div[2]/span')))
-            advertised_product_drop_down = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > section > div.tresah-form-center > div.tresah-inputs-left > div:nth-child(2) > span > span > span > span').click()"
+                                                '//*[@id="advertising-reports"]/div/div/div/div[1]/a')))
+            create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.iBsGPR > a').click()"
+            self.driver.execute_script(create_report)
+            time.sleep(random.randint(4, 7))
+            advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-chPdSV.iiDyb > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
             self.driver.execute_script(advertised_product_drop_down)
             time.sleep(random.randint(4, 7))
-            choose_advertised_product = "document.querySelector('#dropdown1_2').click()"
+            choose_advertised_product = "document.querySelector('#portal > div > div > button:nth-child(3)').click()"
             self.driver.execute_script(choose_advertised_product)
             time.sleep(random.randint(4, 7))
 
             # click daily
-            data_unit_drop_down = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > section > div.tresah-form-center > div.tresah-inputs-right > div:nth-child(2) > span > span > span > span').click()"
-            self.driver.execute_script(data_unit_drop_down)
-            choose_daily = "document.querySelector('#dropdown2_1').click()"
+            # data_unit_drop_down = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > section > div.tresah-form-center > div.tresah-inputs-right > div:nth-child(2) > span > span > span > span').click()"
+            # self.driver.execute_script(data_unit_drop_down)
+            choose_daily = "document.querySelector('#undefined-day').click()"
             self.driver.execute_script(choose_daily)
         except Exception as e:
             print(e)
@@ -699,11 +702,11 @@ class Download(object):
         # select date
         try:
             # click drop down
-            report_period = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > section > div.tresah-form-center > div.tresah-inputs-right > div:nth-child(1) > div > div > span > span > span > span').click()"
+            report_period = "document.querySelector('#cards-container > div.sc-chPdSV.iiDyb > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(4) > td > button').click()"
             self.driver.execute_script(report_period)
             time.sleep(random.randint(4, 7))
 
-            js = "document.querySelector('#a-popover-3 > div > div > ul > li:nth-child(%s) > a').click();" % random.randint(1, 5)
+            js = "document.querySelector('#portal > div > div > div > div.sc-11mc28f-3.jWiMFK > button:nth-child(%s)').click();" % random.randint(1, 5)
             logger.info(js)
             self.driver.execute_script(js)
             logger.info('click drop down')
@@ -717,7 +720,7 @@ class Download(object):
 
         # click create report
         try:
-            create_report = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > section > div.tresah-form-left > span > span > input').click()"
+            create_report = "document.querySelector('#run-report-button').click()"
             self.driver.execute_script(create_report)
         except Exception as e:
             print(e)
@@ -726,14 +729,36 @@ class Download(object):
         time.sleep(random.randint(10, 20))
 
         # click download
+        # 移动鼠标到reports
+        for i in range(0, 3):
+            try:
+                reports = WebDriverWait(self.driver, 940, 0.5).until(
+                    EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+                time.sleep(random.randint(4, 7))
+                webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+                logger.info('go to reports')
+                time.sleep(random.randint(5, 9))
+            except Exception as e:
+                print(e)
+
+            # click advertising reports
+            try:
+                js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child(6) > a').click();"
+                self.driver.execute_script(js_click_advertising_reports)
+                logger.info('click advertising reports')
+                time.sleep(random.randint(4, 7))
+                break
+            except Exception as e:
+                print(e)
+
+        # click download reports
         try:
-            download = "document.querySelector('#tresah > div > div > div.a-container.sspa-bottomless > div:nth-child(4) > div > div > div > div:nth-child(2) > div > div > div > div.fixedDataTableLayout_rowsContainer > div:nth-child(3) > div:nth-child(1) > div > div > div:nth-child(2) > div > div:nth-child(5) > span > span > a').click()"
-            self.driver.execute_script(download)
+            js_click_download = "document.querySelector('#advertising-reports > div > div > div > div.ReactTable > div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(2) > span > a').click();"
+            self.driver.execute_script(js_click_download)
+            logger.info('click download')
+            time.sleep(random.randint(4, 7))
         except Exception as e:
             print(e)
-            self.driver.quit()
-        logger.info('click download')
-        time.sleep(random.randint(20, 30))
 
         dir_list = os.listdir(os.path.expanduser('~/Downloads/'))
         dir_list = sorted(dir_list, key=lambda x: os.path.getmtime(os.path.join(os.path.expanduser('~/Downloads/'), x)))
