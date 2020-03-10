@@ -78,6 +78,7 @@ class Download(object):
 
         # 移动鼠标到inventory
         for i in range(0, 3):
+            click = 'false'
             try:
                 inventory = WebDriverWait(self.driver, 40, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-inventory')))
@@ -93,6 +94,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-inventory"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Inventory Reports':
@@ -101,8 +103,10 @@ class Download(object):
                         self.driver.execute_script(js_click_inventory_reports)
                         logger.info('click inventory reports')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -172,6 +176,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 20, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -187,6 +192,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -196,8 +202,10 @@ class Download(object):
                         self.driver.execute_script(js_click_fulfillments)
                         logger.info('click fulfillments')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -307,6 +315,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
                 time.sleep(random.randint(4, 7))
@@ -321,6 +330,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Fulfillment':
@@ -328,8 +338,10 @@ class Download(object):
                         self.driver.execute_script(js_click_fulfillments)
                         logger.info('click fulfillments')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -414,6 +426,7 @@ class Download(object):
     def go_to_FBA_shipment_download_page(self):
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -429,6 +442,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -438,8 +452,10 @@ class Download(object):
                         self.driver.execute_script(js_click_fulfillments)
                         logger.info('click fulfillments')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -508,6 +524,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 8):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -521,6 +538,7 @@ class Download(object):
                     length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     logger.info(length)
                     for i in range(1, length):
+                        time.sleep(random.randint(3, 7))
                         logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                         report_name = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -530,8 +548,10 @@ class Download(object):
                             self.driver.execute_script(js_click_payments)
                             logger.info('click payments')
                             time.sleep(random.randint(1, 7))
+                            click = 'true'
                             break
-                    break
+                    if click == 'true':
+                        break
                 except Exception as e:
                     print(e)
             except Exception as e:
@@ -610,6 +630,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -625,6 +646,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -634,8 +656,10 @@ class Download(object):
                         self.driver.execute_script(js_click_fulfillments)
                         logger.info('click fulfillments')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -702,6 +726,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -717,6 +742,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -726,8 +752,10 @@ class Download(object):
                         self.driver.execute_script(js_click_advertising_reports)
                         logger.info('click advertising reports')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -794,6 +822,7 @@ class Download(object):
         # click download
         # 移动鼠标到reports
         for i in range(0, 3):
+            click = 'false'
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
@@ -809,6 +838,7 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
+                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
@@ -818,8 +848,10 @@ class Download(object):
                         self.driver.execute_script(js_click_advertising_reports)
                         logger.info('click advertising reports')
                         time.sleep(random.randint(1, 7))
+                        click = 'true'
                         break
-                break
+                if click == 'true':
+                    break
             except Exception as e:
                 print(e)
 
@@ -841,6 +873,7 @@ class Download(object):
 
         # 移动鼠标到reports
         for i in range(0, 3):
+
             try:
                 reports = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
