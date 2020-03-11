@@ -196,6 +196,7 @@ class Download(object):
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    logger.info(report_name)
                     if report_name == 'Fulfillment':
                         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)

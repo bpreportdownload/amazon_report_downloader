@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import click
+import random
 
 from amazon_reports_downloader import logger, get_shared_driver, MARKETPLACE_MAPPING
 from amazon_reports_downloader.utils import YamlConfigLoader
@@ -11,10 +12,13 @@ from amazon_reports_downloader.inventory_manager import Download
 
 
 
+
 @click.command()
 @click.option('-c', '--report', help='[1.order_report 2.FBA_shipment_report 3.finance_report 4.advertising_report 5.campaigns_bulk_report 6.advertising_search_term_report 7.listings_report 8.FBA_inventory_report 9.business_report]')
 def download_report(report):
     logger.info(report)
+    if report != "order_report_today":
+        sys.exit()
     config_path = './amazon_reports_downloader/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
@@ -70,83 +74,67 @@ def download_report(report):
             logger.info(marketplace)
             downloader.close_tooltips()
 
-            if report == "order_report":
-                try:
-                    file_name = downloader.go_to_orders_download_page()
-                    downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "orders_file", marketplace)
-                except Exception as e:
-                    print(e)
+            index = random.randint(0, 7)
+            logger.info(index)
 
-            if report == "order_report_today":
-                try:
-                    file_name = downloader.go_to_today_orders_download_page()
-                    downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "orders_file", marketplace)
-                except Exception as e:
-                    print(e)
+            for i in range(7):
+                logger.info(i)
+                if (i + index) % 7 == 0:
+                    try:
+                        file_name = downloader.go_to_today_orders_download_page()
+                        downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email,
+                                                gideon_password, seller_id, "orders_file", marketplace)
+                    except Exception as e:
+                        print(e)
+                else:
+                    if (int(time.strftime("%H", time.localtime())) > 9) or (int(time.strftime("%H", time.localtime())) < 6):
+                        if (i + index) % 7 == 1:
+                            try:
+                                file_name = downloader.go_to_orders_download_page()
+                                downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email,
+                                                        gideon_password, seller_id, "orders_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
-            if report == "FBA_shipment_report":
-                try:
-                    file_name = downloader.go_to_FBA_shipment_download_page()
-                    downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email, gideon_password, seller_id, "order_shipments_file", marketplace)
-                except Exception as e:
-                    print(e)
+                        if (i + index) % 7 == 2:
+                            try:
+                                file_name = downloader.go_to_FBA_shipment_download_page()
+                                downloader.upload_files("https://300gideon.com/import_orders", file_name, gideon_email,
+                                                        gideon_password, seller_id, "order_shipments_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
-            if report == "finance_report":
-                try:
-                    file_name = downloader.go_to_finance_download_page()
-                    downloader.upload_files("https://300gideon.com/import_finances", file_name, gideon_email, gideon_password, seller_id, "finances_file", marketplace)
-                except Exception as e:
-                    print(e)
+                        if (i + index) % 7 == 3:
+                            try:
+                                file_name = downloader.go_to_finance_download_page()
+                                downloader.upload_files("https://300gideon.com/import_finances", file_name, gideon_email,
+                                                        gideon_password, seller_id, "finances_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
-            if report == "advertising_report":
-                try:
-                    file_name = downloader.go_to_advertising_reports_download_page()
-                    downloader.upload_files("https://300gideon.com/import_ads", file_name, gideon_email,
-                                                     gideon_password, seller_id, "ads_file", marketplace)
-                except Exception as e:
-                    print(e)
+                        if (i + index) % 7 == 4:
+                            try:
+                                file_name = downloader.go_to_advertising_reports_download_page()
+                                downloader.upload_files("https://300gideon.com/import_ads", file_name, gideon_email,
+                                                        gideon_password, seller_id, "ads_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
-            if report == "campaigns_bulk_report":
-                try:
-                    file_name = downloader.go_to_campaigns_bulk_report_download()
-                    downloader.upload_files("https://300gideon.com/import_campaigns", file_name, gideon_email,
-                                                          gideon_password, seller_id, "campaigns_file", marketplace)
-                except Exception as e:
-                    print(e)
+                        if (i + index) % 7 == 5:
+                            try:
+                                file_name = downloader.go_to_listings_download_page()
+                                downloader.upload_files("https://300gideon.com/import_listings", file_name, gideon_email,
+                                                        gideon_password, seller_id, "listings_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
-            if report == "advertising_search_term_report":
-                try:
-                    file_name = downloader.go_to_advertising_search_term_reports_download_page()
-                    downloader.upload_files("https://300gideon.com/import_campaigns", file_name, gideon_email,
-                                                          gideon_password, seller_id, "searchterms_file", marketplace)
-                except Exception as e:
-                    print(e)
-
-            if report == "listings_report":
-                try:
-                    file_name = downloader.go_to_listings_download_page()
-                    downloader.upload_files("https://300gideon.com/import_listings", file_name, gideon_email,
-                                                          gideon_password, seller_id, "listings_file", marketplace)
-                except Exception as e:
-                    print(e)
-
-            if report == "FBA_inventory_report":
-                try:
-                    file_name = downloader.go_to_FBA_inventory_download_page()
-                    downloader.upload_files("https://300gideon.com/import_inventory", file_name, gideon_email,
-                                                          gideon_password, seller_id, "inventory_file", marketplace)
-                except Exception as e:
-                    print(e)
-
-            if report == "business_report":
-                try:
-                    file_name = downloader.go_to_business_report_download()
-                    logger.info(file_name)
-                    downloader.upload_files("https://300gideon.com/import_business", file_name, gideon_email,
-                                                          gideon_password, seller_id, "business_file", marketplace)
-
-                except Exception as e:
-                    print(e)
+                        if (i + index) % 7 == 6:
+                            try:
+                                file_name = downloader.go_to_FBA_inventory_download_page()
+                                downloader.upload_files("https://300gideon.com/import_inventory", file_name, gideon_email,
+                                                        gideon_password, seller_id, "inventory_file", marketplace)
+                            except Exception as e:
+                                print(e)
 
             downloader.close_webdriver()
         except Exception as e:
