@@ -85,7 +85,6 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
                 logger.info('go to inventory')
-                time.sleep(random.randint(7, 9))
             except Exception as e:
                 print(e)
 
@@ -94,10 +93,10 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-inventory"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Inventory Reports':
+                        time.sleep(random.randint(7, 9))
                         js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_inventory_reports)
@@ -183,7 +182,6 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(7, 9))
             except Exception as e:
                 print(e)
 
@@ -192,12 +190,12 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     logger.info(report_name)
                     if report_name == 'Fulfillment':
+                        time.sleep(random.randint(3, 7))
                         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_fulfillments)
@@ -322,7 +320,6 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(7, 9))
             except Exception as e:
                 print(e)
 
@@ -331,10 +328,10 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Fulfillment':
+                        time.sleep(random.randint(3, 7))
                         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(i)
                         self.driver.execute_script(js_click_fulfillments)
                         logger.info('click fulfillments')
@@ -434,7 +431,6 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(7, 9))
             except Exception as e:
                 print(e)
 
@@ -443,11 +439,11 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Fulfillment':
+                        time.sleep(random.randint(7, 9))
                         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_fulfillments)
@@ -532,18 +528,17 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(5, 9))
 
                 # click payments
                 try:
                     length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     logger.info(length)
                     for i in range(1, length):
-                        time.sleep(random.randint(3, 7))
                         logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                         report_name = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                         if report_name == 'Payments':
+                            time.sleep(random.randint(3, 7))
                             js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                                 i)
                             self.driver.execute_script(js_click_payments)
@@ -638,7 +633,6 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(5, 9))
             except Exception as e:
                 print(e)
 
@@ -647,11 +641,11 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Fulfillment':
+                        time.sleep(random.randint(3, 7))
                         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_fulfillments)
@@ -668,12 +662,12 @@ class Download(object):
         # click inventory show more
         try:
             WebDriverWait(self.driver, 910, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[2]/li[23]/a'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#sc-sidepanel > div > ul:nth-child(3) > li.level3-header.show-more > a'))).click()
         except Exception as e:
             print(e)
             try:
                 WebDriverWait(self.driver, 910, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[2]/li[21]/a'))).click()
+                    EC.presence_of_element_located((By.CSS_SELECTOR, '#sc-sidepanel > div > ul:nth-child(3) > li.level3-header.show-more > a'))).click()
             except Exception as e:
                 print(e)
         logger.info('click inventory show more')
@@ -734,7 +728,7 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(5, 9))
+
             except Exception as e:
                 print(e)
 
@@ -743,11 +737,11 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Advertising Reports':
+                        time.sleep(random.randint(5, 9))
                         js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_advertising_reports)
@@ -830,7 +824,7 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                 logger.info('go to reports')
-                time.sleep(random.randint(5, 9))
+
             except Exception as e:
                 print(e)
 
@@ -839,11 +833,11 @@ class Download(object):
                 length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                 logger.info(length)
                 for i in range(1, length):
-                    time.sleep(random.randint(3, 7))
                     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                     report_name = self.driver.find_element_by_xpath(
                         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                     if report_name == 'Advertising Reports':
+                        time.sleep(random.randint(5, 9))
                         js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                             i)
                         self.driver.execute_script(js_click_advertising_reports)
