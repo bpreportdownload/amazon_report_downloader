@@ -87,7 +87,7 @@ def download_report(report):
                     except Exception as e:
                         print(e)
                 else:
-                    if (int(time.strftime("%H", time.localtime())) > 20) or (int(time.strftime("%H", time.localtime())) < 21):
+                    if (int(time.strftime("%H", time.localtime())) > 20) or (int(time.strftime("%H", time.localtime())) < 8):
                         if (i + index) % 7 == 1:
                             try:
                                 file_name = downloader.go_to_orders_download_page()

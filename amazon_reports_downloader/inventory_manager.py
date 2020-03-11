@@ -171,6 +171,14 @@ class Download(object):
         except:
             pass
 
+
+    def multi_download(self):
+        # close tooltips
+        try:
+            self.driver.find_element_by_xpath('//*[@id="step-0"]/div[2]/button').click()
+        except:
+            pass
+
     def go_to_today_orders_download_page(self):
 
         # 移动鼠标到reports
