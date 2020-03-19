@@ -26,6 +26,17 @@ def download_report(report):
     cl = YamlConfigLoader(config_path)
     config = cl.load()
 
+    if report == 'listing_info':
+        seller_id = config['account']['seller_id']
+        driver = get_shared_driver('us')
+        downloader = Download(driver)
+        logger.info(seller_id)
+        downloader.listing_info_scrapy(seller_id)
+        downloader.close_webdriver()
+        return
+
+
+
     for marketplace in config['account']['marketplace']:
         email = config['account']['email']
         password = config['account']['password']

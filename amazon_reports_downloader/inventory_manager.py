@@ -69,7 +69,10 @@ class Download(object):
             'business_report': '',
         }
 
-
+    def listing_info_scrapy(self, seller_id):
+        self.driver.get("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+        logger.info("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+        time.sleep(random.randint(4, 7))
 
     def scroll_down(self,):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
