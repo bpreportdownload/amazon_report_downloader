@@ -3,6 +3,7 @@ import random
 import re
 import os
 import datetime
+import requests
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -73,6 +74,190 @@ class Download(object):
         self.driver.get("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
         logger.info("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
         time.sleep(random.randint(4, 7))
+        items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
+        ASINs = []
+        for item in items[0:-1]:
+            ASINs.append(item.get_attribute('data-asin'))
+
+        logger.info(ASINs)
+        listing_base = 'https://www.amazon.com/dp/'
+        try:
+            for ASIN in ASINs:
+                logger.info(ASIN)
+                record_flag = 0
+                self.driver.execute_script("window.open('');")
+                time.sleep(random.randint(5, 10))
+
+                # Switch to the new window
+                self.driver.switch_to.window(self.driver.window_handles[1])
+                time.sleep(random.randint(5, 10))
+                logger.info(listing_base + ASIN)
+                self.driver.get(listing_base + ASIN)
+                time.sleep(random.randint(5, 10))
+                title = self.driver.find_element_by_id('productTitle').text
+                brand = self.driver.find_element_by_id('bylineInfo').text
+
+                wrap_image = self.driver.find_element_by_id('landingImage').get_attribute('src')
+                logger.info(wrap_image)
+                rating = self.driver.find_element_by_id('acrCustomerReviewText').text
+                for i in range(3):
+                    try:
+                        logger.info(
+                            'http://homestead.test/listing_info/seller_id={seller_id}/asin={asin}/title={title}/brand={brand}'.format(
+                                seller_id=seller_id, asin=ASIN, title=title, brand=brand))
+
+                        logger.info(res)
+                        break
+                    except Exception as e:
+                        print(e)
+                        time.sleep(random.randint(5, 10))
+
+                information = self.driver.find_element_by_id('prodDetails').text
+                logger.info(information)
+                rank = ' '
+                try:
+                    rank_list = re.findall(r'Best Sellers Rank #(.*?)\(See Top 100 in', information)
+                    logger.info(type(rank_list))
+                    logger.info(rank_list)
+                    rank = rank_list[0].lstrip('#')
+                    logger.info("rank: " + rank)
+                except Exception as e:
+                    print(e)
+                reviews_base = 'https://www.amazon.com/product-reviews/'
+                logger.info(reviews_base + ASIN)
+                self.driver.get(reviews_base + ASIN)
+                star_rating = self.driver.find_element_by_xpath(
+                    '//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span/a/span').text
+                logger.info("title: " + title)
+                logger.info("brand: " + brand)
+                logger.info("ratings: " + rating)
+                logger.info("star: " + star_rating)
+                today = datetime.date.today()
+                for i in range(3):
+                    try:
+
+                        res = requests.get(
+                            'http://homestead.test/listing_status/asin={asin}/star_rating={star_rating}/rating={rating}/date={date}/rank={rank}'.format(
+                                asin=ASIN, star_rating=star_rating, rating=rating, date=today, rank=rank))
+                        logger.info(
+                            'http://homestead.test/listing_status/asin={asin}/star_rating={star_rating}/rating={rating}/date={date}/rank={rank}'.format(
+                                asin=ASIN, star_rating=star_rating, rating=rating, date=today, rank=rank))
+
+                        logger.info(res)
+                        break
+                    except Exception as e:
+                        print(e)
+                        time.sleep(random.randint(5, 10))
+
+                self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
+                self.driver.find_element_by_id('sort-order-dropdown_1').click()
+                time.sleep(random.randint(5, 10))
+                self.driver.refresh()
+                time.sleep(random.randint(5, 10))
+
+                for i in range(1, 5):
+
+                    self.driver.get(
+                        reviews_base + ASIN + '/ref=cm_cr_getr_d_paging_btm_next_{next_page}?ie=UTF8&reviewerType=all_reviews&pageNumber={page}&sortBy=recent'.format(
+                            next_page=i, page=i))
+                    time.sleep(random.randint(5, 10))
+
+                    review_list = self.driver.find_elements_by_xpath('//*[@id="cm_cr-review_list"]/div')
+                    reviews = review_list[0:10]
+                    review_ids = []
+
+                    for review in reviews:
+                        review_id = review.get_attribute('id')
+                        logger.info("review_id: " + review_id)
+                        review_ids.append(review_id)
+                    time.sleep(random.randint(5, 10))
+                    try:
+                        for review_id in review_ids:
+                            logger.info("review_id: " + review_id)
+                            review_link = 'https://www.amazon.com/gp/customer-reviews/{review_id}/ref=cm_cr_getr_d_rvw_ttl?ie=UTF8&amp;ASIN={ASIN}'.format(
+                                review_id=review_id, ASIN=ASIN)
+                            self.driver.execute_script("window.open('');")
+                            time.sleep(random.randint(5, 10))
+
+                            # Switch to the new window
+                            self.driver.switch_to.window(self.driver.window_handles[2])
+                            time.sleep(random.randint(5, 10))
+                            self.driver.get(review_link)
+                            reviewer_name = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
+                                    review_id=review_id)).text
+                            logger.info("reviewer_name: " + reviewer_name)
+                            review_title = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[2]/a[2]/span'.format(
+                                    review_id=review_id)).text
+                            logger.info("review_title: " + review_title)
+                            star_rating = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
+                                    review_id=review_id)).get_attribute('title')
+                            logger.info("review_star: " + star_rating)
+                            review_date = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
+                            logger.info("review_date: " + review_date)
+                            review_text = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
+                                    review_id=review_id)).text
+                            logger.info("review_text: " + review_text)
+                            review_image = ' '
+                            try:
+                                review_image = self.driver.find_element_by_xpath(
+                                    '//*[@id="{review_id}_imageSection_main"]/div[1]/img'.format(
+                                        review_id=review_id)).get_attribute('src')
+
+                            except Exception as e:
+                                print(e)
+                            review_video = ' '
+                            try:
+                                review_video = self.driver.find_element_by_xpath(
+                                    '//*[@id="video-block-{review_id}"]/div/div[1]/video'.format(
+                                        review_id=review_id)).get_attribute('src')
+
+                            except Exception as e:
+                                print(e)
+
+                            verified = 'not verified'
+                            try:
+                                verified = self.driver.find_element_by_xpath(
+                                    '//*[@id="customer_review-{review_id}"]/div[3]/span/a/span'.format(
+                                        review_id=review_id)).text
+                            except Exception as e:
+                                print(e)
+                            logger.info("verified: " + verified)
+                            time.sleep(random.randint(5, 10))
+
+                            data = {'asin': ASIN, 'review_id': review_id, 'title': title, 'author': reviewer_name,
+                                    'verified': verified, 'text': review_text, 'star_rating': star_rating,
+                                    'date': review_date, 'image': review_image, 'video': review_video}
+                            # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
+
+                            try:
+                                logger.info("review_image: " + review_image)
+                                logger.info("review_video: " + review_video)
+                                res = requests.post('http://homestead.test/review_info', data=data)
+
+                                logger.info(res.text)
+                                if res.text[0] == 'Y':
+                                    record_flag = record_flag + 1
+                                if record_flag > 20:
+                                    break
+                                logger.info(record_flag)
+                            except Exception as e:
+                                print(e)
+                                time.sleep(random.randint(5, 10))
+                            self.driver.close()
+                            self.driver.switch_to.window(self.driver.window_handles[1])
+                            time.sleep(random.randint(5, 10))
+                    except Exception as e:
+                        print(e)
+                        self.driver.quit()
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+        self.driver.close()
 
     def scroll_down(self,):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
