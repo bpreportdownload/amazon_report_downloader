@@ -188,7 +188,7 @@ class Download(object):
                 time.sleep(random.randint(5, 10))
 
                 for i in range(int(s), int(t)):
-
+                    logger.info("page index: " + str(i))
                     self.driver.get(
                         reviews_base + ASIN + '/ref=cm_cr_getr_d_paging_btm_next_{next_page}?ie=UTF8&reviewerType=all_reviews&pageNumber={page}&sortBy=recent'.format(
                             next_page=i, page=i))
