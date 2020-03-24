@@ -154,6 +154,7 @@ class Download(object):
 
                 res = requests.post(url=url, data=params)
                 logger.info(res)
+                time.sleep(random.randint(5, 10))
 
         except Exception as e:
             print(e)
