@@ -83,10 +83,10 @@ class Download(object):
         logger.info(ASINs)
         listing_base = 'https://www.amazon.{marketplace}/dp/'.format(marketplace=marketplace)
         try:
+            self.driver.execute_script("window.open('');")
             for ASIN in ASINs:
                 logger.info(ASIN)
                 record_flag = 0
-                self.driver.execute_script("window.open('');")
                 time.sleep(random.randint(5, 10))
 
                 # Switch to the new window
