@@ -15,6 +15,8 @@ from amazon_reports_downloader.inventory_manager import Download
 
 @click.command()
 @click.option('-c', '--report', help='[1.order_report 2.FBA_shipment_report 3.finance_report 4.advertising_report 5.campaigns_bulk_report 6.advertising_search_term_report 7.listings_report 8.FBA_inventory_report 9.business_report]')
+@click.argument('report', nargs=-1)
+
 def download_report(report):
     logger.info(report)
     config_path = './amazon_reports_downloader/inventory_download.yml'
@@ -26,6 +28,19 @@ def download_report(report):
     cl = YamlConfigLoader(config_path)
     config = cl.load()
 
+    try:
+        if report[0] == 'report':
+            seller_id = config['account']['seller_id']
+            driver = get_shared_driver('us')
+            downloader = Download(driver)
+            logger.info(seller_id)
+            downloader.review_info_scrapy(seller_id, report[1], report[2])
+            downloader.close_webdriver()
+            return
+
+    except Exception as e:
+        print(e)
+
     if report == 'listing_info':
         seller_id = config['account']['seller_id']
         driver = get_shared_driver('us')
@@ -34,6 +49,7 @@ def download_report(report):
         downloader.listing_info_scrapy(seller_id)
         downloader.close_webdriver()
         return
+
 
 
 

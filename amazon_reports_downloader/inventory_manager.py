@@ -4,6 +4,7 @@ import re
 import os
 import datetime
 import requests
+import calendar
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -100,19 +101,11 @@ class Download(object):
                 wrap_image = self.driver.find_element_by_id('landingImage').get_attribute('src')
                 logger.info(wrap_image)
                 rating = self.driver.find_element_by_id('acrCustomerReviewText').text
-                for i in range(3):
-                    try:
-                        logger.info(
-                            'http://homestead.test/listing_info/seller_id={seller_id}/asin={asin}/title={title}/brand={brand}'.format(
-                                seller_id=seller_id, asin=ASIN, title=title, brand=brand))
-
-                        logger.info(res)
-                        break
-                    except Exception as e:
-                        print(e)
-                        time.sleep(random.randint(5, 10))
-
-                information = self.driver.find_element_by_id('prodDetails').text
+                try:
+                    information = self.driver.find_element_by_id('prodDetails').text
+                except Exception as e:
+                    print(e)
+                    information = self.driver.find_element_by_id('detail_bullets_id').text
                 logger.info(information)
                 rank = ' '
                 try:
@@ -123,31 +116,70 @@ class Download(object):
                     logger.info("rank: " + rank)
                 except Exception as e:
                     print(e)
+
+                try:
+                    shipping_weight_list = re.findall(r'Shipping Weight(.*?)\n', information)
+                    logger.info(type(shipping_weight_list))
+                    logger.info(shipping_weight_list)
+                    shipping_weight_str = shipping_weight_list[0]
+                    shipping_weight_num = shipping_weight_str.split(' ')[1]
+                    shipping_weight_dim = shipping_weight_str.split(' ')[2]
+                    logger.info(shipping_weight_num)
+                    logger.info(shipping_weight_dim)
+                    if shipping_weight_dim == 'pounds':
+                        shipping_weight = shipping_weight_num
+                    elif shipping_weight_dim == 'g':
+                        shipping_weight = shipping_weight_num / 453.6
+                    logger.info("shipping_weight: " + shipping_weight)
+                except Exception as e:
+                    print(e)
+
                 reviews_base = 'https://www.amazon.com/product-reviews/'
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
                 star_rating = self.driver.find_element_by_xpath(
-                    '//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span/a/span').text
+                    '//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span').text
+
                 logger.info("title: " + title)
                 logger.info("brand: " + brand)
                 logger.info("ratings: " + rating)
                 logger.info("star: " + star_rating)
                 today = datetime.date.today()
-                for i in range(3):
-                    try:
+                url = "https://300gideon.com/product/update-info"
+                params = {"asin": ASIN, "sales_ranks": rank, "brand": brand, "small_image": wrap_image, "weight": shipping_weight}
 
-                        res = requests.get(
-                            'http://homestead.test/listing_status/asin={asin}/star_rating={star_rating}/rating={rating}/date={date}/rank={rank}'.format(
-                                asin=ASIN, star_rating=star_rating, rating=rating, date=today, rank=rank))
-                        logger.info(
-                            'http://homestead.test/listing_status/asin={asin}/star_rating={star_rating}/rating={rating}/date={date}/rank={rank}'.format(
-                                asin=ASIN, star_rating=star_rating, rating=rating, date=today, rank=rank))
+                res = requests.post(url=url, data=params)
+                logger.info(res)
 
-                        logger.info(res)
-                        break
-                    except Exception as e:
-                        print(e)
-                        time.sleep(random.randint(5, 10))
+        except Exception as e:
+            print(e)
+
+    def review_info_scrapy(self, seller_id, s, t):
+        self.driver.get(
+            "https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+        logger.info("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+        time.sleep(random.randint(4, 7))
+        items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
+        ASINs = []
+        for item in items[0:-1]:
+            ASINs.append(item.get_attribute('data-asin'))
+
+        logger.info(ASINs)
+        listing_base = 'https://www.amazon.com/dp/'
+        try:
+            for ASIN in ASINs:
+                logger.info(ASIN)
+                record_flag = 0
+                self.driver.execute_script("window.open('');")
+                time.sleep(random.randint(5, 10))
+
+                # Switch to the new window
+                self.driver.switch_to.window(self.driver.window_handles[1])
+                reviews_base = 'https://www.amazon.com/product-reviews/'
+                logger.info(reviews_base + ASIN)
+                self.driver.get(reviews_base + ASIN)
+
+                today = datetime.date.today()
 
                 self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
                 self.driver.find_element_by_id('sort-order-dropdown_1').click()
@@ -155,7 +187,7 @@ class Download(object):
                 self.driver.refresh()
                 time.sleep(random.randint(5, 10))
 
-                for i in range(1, 5):
+                for i in range(int(s), int(t)):
 
                     self.driver.get(
                         reviews_base + ASIN + '/ref=cm_cr_getr_d_paging_btm_next_{next_page}?ie=UTF8&reviewerType=all_reviews&pageNumber={page}&sortBy=recent'.format(
@@ -174,8 +206,8 @@ class Download(object):
                     try:
                         for review_id in review_ids:
                             logger.info("review_id: " + review_id)
-                            review_link = 'https://www.amazon.com/gp/customer-reviews/{review_id}/ref=cm_cr_getr_d_rvw_ttl?ie=UTF8&amp;ASIN={ASIN}'.format(
-                                review_id=review_id, ASIN=ASIN)
+                            review_link = 'https://www.amazon.com/gp/customer-reviews/{review_id}'.format(
+                                review_id=review_id)
                             self.driver.execute_script("window.open('');")
                             time.sleep(random.randint(5, 10))
 
@@ -195,14 +227,28 @@ class Download(object):
                                 '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
                                     review_id=review_id)).get_attribute('title')
                             logger.info("review_star: " + star_rating)
-                            review_date = self.driver.find_element_by_xpath(
+                            review_date_info = self.driver.find_element_by_xpath(
                                 '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
+                            country_index = review_date_info.find('United States')
+                            review_country = 'US'
+                            if country_index > 0:
+                                review_country = 'US'
+                            review_date_info_list = review_date_info.split(' ')
+                            logger.info(review_date_info_list)
+                            review_date_year = review_date_info_list[-1]
+                            logger.info(review_date_year)
+                            review_date_day = review_date_info_list[-2][:-1]
+                            logger.info(review_date_day)
+                            logger.info(review_date_info_list[-3])
+                            review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
+                            logger.info(review_date_month)
+                            review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
                             review_text = self.driver.find_element_by_xpath(
                                 '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
                                     review_id=review_id)).text
                             logger.info("review_text: " + review_text)
-                            review_image = ' '
+                            review_image = 'no'
                             try:
                                 review_image = self.driver.find_element_by_xpath(
                                     '//*[@id="{review_id}_imageSection_main"]/div[1]/img'.format(
@@ -210,7 +256,7 @@ class Download(object):
 
                             except Exception as e:
                                 print(e)
-                            review_video = ' '
+                            review_video = 'no'
                             try:
                                 review_video = self.driver.find_element_by_xpath(
                                     '//*[@id="video-block-{review_id}"]/div/div[1]/video'.format(
@@ -219,25 +265,27 @@ class Download(object):
                             except Exception as e:
                                 print(e)
 
-                            verified = 'not verified'
+                            verified = '0'
                             try:
-                                verified = self.driver.find_element_by_xpath(
+                                if self.driver.find_element_by_xpath(
                                     '//*[@id="customer_review-{review_id}"]/div[3]/span/a/span'.format(
-                                        review_id=review_id)).text
+                                        review_id=review_id)).text == 'Verified Purchase':
+                                    verified = '1'
                             except Exception as e:
                                 print(e)
                             logger.info("verified: " + verified)
                             time.sleep(random.randint(5, 10))
 
-                            data = {'asin': ASIN, 'review_id': review_id, 'title': title, 'author': reviewer_name,
-                                    'verified': verified, 'text': review_text, 'star_rating': star_rating,
-                                    'date': review_date, 'image': review_image, 'video': review_video}
+                            data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
+                                    'verified_purchase': verified, 'review_text': review_text, 'review_rating': star_rating,
+                                    'review_date': review_date, 'image': review_image, 'video': review_video,
+                                    'review_link': review_link, 'country': review_country, "review_exist": "1"}
                             # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
 
                             try:
                                 logger.info("review_image: " + review_image)
                                 logger.info("review_video: " + review_video)
-                                res = requests.post('http://homestead.test/review_info', data=data)
+                                res = requests.post('https://300gideon.com/review/info', data=data)
 
                                 logger.info(res.text)
                                 if res.text[0] == 'Y':
