@@ -1007,11 +1007,18 @@ class Download(object):
         # choose Advertised product
         try:
             # click drop down
-            WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.XPATH,
-                                                '//*[@id="advertising-reports"]/div/div/div/div[1]/a')))
-            create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.iBsGPR > a').click()"
-            self.driver.execute_script(create_report)
+            try:
+                WebDriverWait(self.driver, 940, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH,
+                                                    '//*[@id="advertising-reports"]/div/div/div/div[1]/a/button')))
+                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.dzhatw > a').click()"
+                self.driver.execute_script(create_report)
+            except Exception as e:
+                WebDriverWait(self.driver, 940, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH,
+                                                    '//*[@id="advertising-reports"]/div/div/div/div[1]/a')))
+                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.iBsGPR > a').click()"
+                self.driver.execute_script(create_report)
             time.sleep(random.randint(4, 7))
             # advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-chPdSV.iiDyb > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
             advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-chPdSV.hJxqxz > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
