@@ -1,1 +1,2 @@
-download_report report 1 10
+download_report -c review_info
+

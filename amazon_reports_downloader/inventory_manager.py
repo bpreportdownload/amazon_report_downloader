@@ -71,9 +71,9 @@ class Download(object):
             'business_report': '',
         }
 
-    def listing_info_scrapy(self, seller_id):
-        self.driver.get("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
-        logger.info("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+    def listing_info_scrapy(self, marketplace, seller_id):
+        self.driver.get("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
+        logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
         time.sleep(random.randint(4, 7))
         items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
         ASINs = []
@@ -81,7 +81,7 @@ class Download(object):
             ASINs.append(item.get_attribute('data-asin'))
 
         logger.info(ASINs)
-        listing_base = 'https://www.amazon.com/dp/'
+        listing_base = 'https://www.amazon.{marketplace}/dp/'.format(marketplace=marketplace)
         try:
             for ASIN in ASINs:
                 logger.info(ASIN)
@@ -134,7 +134,7 @@ class Download(object):
                 except Exception as e:
                     print(e)
 
-                reviews_base = 'https://www.amazon.com/product-reviews/'
+                reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
                 star_rating = self.driver.find_element_by_xpath(
@@ -154,10 +154,10 @@ class Download(object):
         except Exception as e:
             print(e)
 
-    def review_info_scrapy(self, seller_id, s, t):
+    def review_info_scrapy(self, marketplace, seller_id, s, t):
         self.driver.get(
-            "https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
-        logger.info("https://www.amazon.com/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(seller_id=seller_id))
+            "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
+        logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
         time.sleep(random.randint(4, 7))
         items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
         ASINs = []
@@ -165,7 +165,7 @@ class Download(object):
             ASINs.append(item.get_attribute('data-asin'))
 
         logger.info(ASINs)
-        listing_base = 'https://www.amazon.com/dp/'
+        listing_base = 'https://www.amazon.{marketplace}/dp/'.format(marketplace=marketplace)
         try:
             for ASIN in ASINs:
                 logger.info(ASIN)
@@ -175,7 +175,7 @@ class Download(object):
 
                 # Switch to the new window
                 self.driver.switch_to.window(self.driver.window_handles[1])
-                reviews_base = 'https://www.amazon.com/product-reviews/'
+                reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
 
@@ -206,8 +206,8 @@ class Download(object):
                     try:
                         for review_id in review_ids:
                             logger.info("review_id: " + review_id)
-                            review_link = 'https://www.amazon.com/gp/customer-reviews/{review_id}'.format(
-                                review_id=review_id)
+                            review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
+                                marketplace=marketplace, review_id=review_id)
                             self.driver.execute_script("window.open('');")
                             time.sleep(random.randint(5, 10))
 
