@@ -93,8 +93,7 @@ class Download(object):
                 self.driver.switch_to.window(self.driver.window_handles[1])
                 time.sleep(random.randint(5, 10))
                 logger.info(listing_base + ASIN)
-                # self.driver.get(listing_base + ASIN)
-                self.driver.get('https://www.amazon.com/dp/B07ZWG4V7N')
+                self.driver.get(listing_base + ASIN)
                 time.sleep(random.randint(5, 10))
                 title = self.driver.find_element_by_id('productTitle').text
                 brand = self.driver.find_element_by_id('bylineInfo').text
@@ -132,9 +131,9 @@ class Download(object):
                     if shipping_weight_dim == 'pounds':
                         shipping_weight = shipping_weight_num
                     elif shipping_weight_dim == 'g':
-                        shipping_weight = shipping_weight_num / 453.6
+                        shipping_weight = str(float(shipping_weight_num) / 453.6)
                     elif shipping_weight_dim == 'ounces':
-                        shipping_weight = shipping_weight_num / 16
+                        shipping_weight = str(float(shipping_weight_num) / 16)
                     logger.info("shipping_weight: " + shipping_weight)
                 except Exception as e:
                     print(e)
