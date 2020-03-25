@@ -45,7 +45,7 @@ def download_report(report):
         if report == 'review_info':
             downloader = Download(driver)
             logger.info(seller_id)
-            downloader.review_info_scrapy(domain, seller_id, 1, 20)
+            downloader.review_info_scrapy(domain, seller_id, 1, 5)
             downloader.close_webdriver()
             return
 
