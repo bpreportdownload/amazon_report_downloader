@@ -96,8 +96,7 @@ class Download(object):
                 self.driver.get(listing_base + ASIN)
                 time.sleep(random.randint(5, 10))
                 if self.driver.page_source.find('Fulfilled by Amazon') < 0:
-                    self.driver.close()
-                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    logger.info('ASIN: ' + ASIN + ' is not FBA')
                     continue
                 title = self.driver.find_element_by_id('productTitle').text
                 brand = self.driver.find_element_by_id('bylineInfo').text
