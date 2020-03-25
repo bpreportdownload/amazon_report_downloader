@@ -93,8 +93,7 @@ class Download(object):
                 self.driver.switch_to.window(self.driver.window_handles[1])
                 time.sleep(random.randint(5, 10))
                 logger.info(listing_base + ASIN)
-                # self.driver.get(listing_base + ASIN)
-                self.driver.get("https://www.amazon.com/dp/B07XWF4F17")
+                self.driver.get(listing_base + ASIN)
                 time.sleep(random.randint(5, 10))
                 if self.driver.page_source.find('Fulfilled by Amazon') < 0:
                     logger.info('ASIN: ' + ASIN + ' is not FBA')
