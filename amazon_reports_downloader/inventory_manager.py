@@ -95,6 +95,10 @@ class Download(object):
                 logger.info(listing_base + ASIN)
                 self.driver.get(listing_base + ASIN)
                 time.sleep(random.randint(5, 10))
+                if self.driver.page_source.find('Fulfilled by Amazon') < 0:
+                    self.driver.close()
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    continue
                 title = self.driver.find_element_by_id('productTitle').text
                 brand = self.driver.find_element_by_id('bylineInfo').text
 
@@ -171,6 +175,7 @@ class Download(object):
 
         logger.info(ASINs)
         listing_base = 'https://www.amazon.{marketplace}/dp/'.format(marketplace=marketplace)
+        reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
         try:
             for ASIN in ASINs:
                 logger.info(ASIN)
@@ -180,7 +185,14 @@ class Download(object):
 
                 # Switch to the new window
                 self.driver.switch_to.window(self.driver.window_handles[1])
-                reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
+                self.driver.get(listing_base + ASIN)
+                time.sleep(random.randint(5, 10))
+                if self.driver.page_source.find('Fulfilled by Amazon') < 0:
+                    logger.info('ASIN: ' + ASIN + ' is not FBA')
+                    self.driver.close()
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    continue
+
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
 
