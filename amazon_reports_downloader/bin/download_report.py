@@ -26,13 +26,10 @@ def download_report(report):
 
     cl = YamlConfigLoader(config_path)
     config = cl.load()
-
-
-
-
-
+    logger.info(config['account']['marketplace'])
 
     for marketplace in config['account']['marketplace']:
+        logger.info(marketplace)
         email = config['account']['email']
         password = config['account']['password']
         gideon_email = config['account']['gideon_email']
@@ -47,14 +44,14 @@ def download_report(report):
             logger.info(seller_id)
             downloader.review_info_scrapy(domain, seller_id, 1, 5)
             downloader.close_webdriver()
-            return
+            continue
 
         if report == 'listing_info':
             downloader = Download(driver)
             logger.info(seller_id)
             downloader.listing_info_scrapy(domain, seller_id)
             downloader.close_webdriver()
-            return
+            continue
         helper = SellerLoginHelper(driver, email, password, marketplace)
         downloader = Download(driver)
 
