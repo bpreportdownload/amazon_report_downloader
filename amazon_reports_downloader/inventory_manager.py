@@ -93,7 +93,8 @@ class Download(object):
                 self.driver.switch_to.window(self.driver.window_handles[1])
                 time.sleep(random.randint(5, 10))
                 logger.info(listing_base + ASIN)
-                self.driver.get(listing_base + ASIN)
+                # self.driver.get(listing_base + ASIN)
+                self.driver.get("https://www.amazon.com/dp/B07XWF4F17")
                 time.sleep(random.randint(5, 10))
                 if self.driver.page_source.find('Fulfilled by Amazon') < 0:
                     logger.info('ASIN: ' + ASIN + ' is not FBA')
@@ -110,7 +111,13 @@ class Download(object):
                     try:
                         information = self.driver.find_element_by_id('detail-bullets').text
                     except Exception as e:
-                        information = self.driver.find_element_by_id('detail_bullets_id').text
+                        try:
+                            information = self.driver.find_element_by_id('detail_bullets_id').text
+                        except Exception as e:
+                            try:
+                                information = self.driver.find_element_by_id('detailBullets_feature_div').text
+                            except Exception as e:
+                                print(e)
                 logger.info(information)
                 rank = ' '
                 try:
