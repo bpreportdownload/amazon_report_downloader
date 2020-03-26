@@ -123,11 +123,13 @@ class Download(object):
                                 print(e)
                 logger.info(information)
                 rank = ' '
-
-                rank_list = re.findall(r'Best Sellers Rank #(.*?)\(See Top 100 in', information)
-                logger.info(type(rank_list))
-                logger.info(rank_list)
-                rank = rank_list[0].lstrip('#')
+                try:
+                    rank_list = re.findall(r'Best Sellers Rank #(.*?)\(See Top 100 in', information)
+                    logger.info(type(rank_list))
+                    logger.info(rank_list)
+                    rank = rank_list[0].lstrip('#')
+                except Exception as e:
+                    print(e)
                 logger.info("rank: " + rank)
 
                 shipping_weight_list = re.findall(r'Shipping Weight(.*?)\n', information)
@@ -232,15 +234,33 @@ class Download(object):
                         review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
                             marketplace=marketplace, review_id=review_id)
                         self.driver.execute_script("window.open('');")
-                        time.sleep(random.randint(5, 10))
+                        time.sleep(random.randint(1, 5))
 
                         # Switch to the new window
                         self.driver.switch_to.window(self.driver.window_handles[2])
-                        time.sleep(random.randint(5, 10))
+                        time.sleep(random.randint(1, 5))
                         self.driver.get(review_link)
-                        reviewer_name = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
-                                review_id=review_id)).text
+                        time.sleep(random.randint(1, 5))
+                        review_date_info = self.driver.find_element_by_xpath(
+                            '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
+                        us_index = review_date_info.find('United States')
+                        ca_index = review_date_info.find('Canada')
+                        uk_index = review_date_info.find('United Kingdom')
+                        review_country = 'US'
+                        if us_index > 0:
+                            review_country = 'US'
+                        if ca_index > 0:
+                            review_country = 'CA'
+                        if uk_index > 0:
+                            review_country = 'UK'
+                        try:
+                            reviewer_name = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
+                                    review_id=review_id)).text
+                        except Exception as e:
+                            reviewer_name = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[1]/div[1]/div/a/div[2]/span'.format(
+                                    review_id=review_id)).text
                         logger.info("reviewer_name: " + reviewer_name)
                         review_title = self.driver.find_element_by_xpath(
                             '//*[@id="customer_review-{review_id}"]/div[2]/a[2]/span'.format(
@@ -250,12 +270,7 @@ class Download(object):
                             '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
                                 review_id=review_id)).get_attribute('title')
                         logger.info("review_star: " + star_rating)
-                        review_date_info = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
-                        country_index = review_date_info.find('United States')
-                        review_country = 'US'
-                        if country_index > 0:
-                            review_country = 'US'
+
                         review_date_info_list = review_date_info.split(' ')
                         logger.info(review_date_info_list)
                         review_date_year = review_date_info_list[-1]
@@ -297,6 +312,7 @@ class Download(object):
                         except Exception as e:
                             print(e)
                         logger.info("verified: " + verified)
+
                         time.sleep(random.randint(5, 10))
 
                         data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
