@@ -42,15 +42,21 @@ def download_report(report):
         if report == 'review_info':
             downloader = Download(driver)
             logger.info(seller_id)
-            downloader.review_info_scrapy(domain, seller_id, 1, 5)
-            downloader.close_webdriver()
+            try:
+                downloader.review_info_scrapy(domain, seller_id, 1, 5)
+                downloader.close_webdriver()
+            except Exception as e:
+                downloader.save_page(e)
             continue
 
         if report == 'listing_info':
             downloader = Download(driver)
             logger.info(seller_id)
-            downloader.listing_info_scrapy(domain, seller_id)
-            downloader.close_webdriver()
+            try:
+                downloader.listing_info_scrapy(domain, seller_id)
+                downloader.close_webdriver()
+            except Exception as e:
+                downloader.save_page(e)
             continue
         helper = SellerLoginHelper(driver, email, password, marketplace)
         downloader = Download(driver)
@@ -203,6 +209,8 @@ def download_report(report):
 
             downloader.close_webdriver()
         except Exception as e:
+            logger.info("error occour")
+            downloader.save_page()
             print(e)
 
 
