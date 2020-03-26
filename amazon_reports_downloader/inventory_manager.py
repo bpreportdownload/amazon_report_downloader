@@ -242,6 +242,11 @@ class Download(object):
                             time.sleep(random.randint(1, 5))
                             self.driver.get(review_link)
                             time.sleep(random.randint(1, 5))
+                            try:
+                                page_not_found = self.driver.find_element_by_selector('#g > div > a > img')
+                            except Exception as e:
+                                print(e)
+                                continue
                             review_date_info = self.driver.find_element_by_xpath(
                                 '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
                             us_index = review_date_info.find('United States')
