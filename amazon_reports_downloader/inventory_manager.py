@@ -231,7 +231,7 @@ class Download(object):
 
                     for review_id in review_ids:
                         logger.info("review_id: " + review_id)
-                        if (review_id[0] == 'R'):
+                        if review_id[0] == 'R':
                             review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
                                 marketplace=marketplace, review_id=review_id)
                             self.driver.execute_script("window.open('');")
