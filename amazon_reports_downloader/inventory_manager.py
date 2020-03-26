@@ -231,112 +231,113 @@ class Download(object):
 
                     for review_id in review_ids:
                         logger.info("review_id: " + review_id)
-                        review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
-                            marketplace=marketplace, review_id=review_id)
-                        self.driver.execute_script("window.open('');")
-                        time.sleep(random.randint(1, 5))
+                        if (review_id[0] == 'R'):
+                            review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
+                                marketplace=marketplace, review_id=review_id)
+                            self.driver.execute_script("window.open('');")
+                            time.sleep(random.randint(1, 5))
 
-                        # Switch to the new window
-                        self.driver.switch_to.window(self.driver.window_handles[2])
-                        time.sleep(random.randint(1, 5))
-                        self.driver.get(review_link)
-                        time.sleep(random.randint(1, 5))
-                        review_date_info = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
-                        us_index = review_date_info.find('United States')
-                        ca_index = review_date_info.find('Canada')
-                        uk_index = review_date_info.find('United Kingdom')
-                        review_country = 'US'
-                        if us_index > 0:
+                            # Switch to the new window
+                            self.driver.switch_to.window(self.driver.window_handles[2])
+                            time.sleep(random.randint(1, 5))
+                            self.driver.get(review_link)
+                            time.sleep(random.randint(1, 5))
+                            review_date_info = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
+                            us_index = review_date_info.find('United States')
+                            ca_index = review_date_info.find('Canada')
+                            uk_index = review_date_info.find('United Kingdom')
                             review_country = 'US'
-                        if ca_index > 0:
-                            review_country = 'CA'
-                        if uk_index > 0:
-                            review_country = 'UK'
-                        try:
-                            reviewer_name = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
+                            if us_index > 0:
+                                review_country = 'US'
+                            if ca_index > 0:
+                                review_country = 'CA'
+                            if uk_index > 0:
+                                review_country = 'UK'
+                            try:
+                                reviewer_name = self.driver.find_element_by_xpath(
+                                    '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
+                                        review_id=review_id)).text
+                            except Exception as e:
+                                reviewer_name = self.driver.find_element_by_xpath(
+                                    '//*[@id="customer_review-{review_id}"]/div[1]/div[1]/div/a/div[2]/span'.format(
+                                        review_id=review_id)).text
+                            logger.info("reviewer_name: " + reviewer_name)
+                            review_title = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[2]/a[2]/span'.format(
                                     review_id=review_id)).text
-                        except Exception as e:
-                            reviewer_name = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[1]/div[1]/div/a/div[2]/span'.format(
+                            logger.info("review_title: " + review_title)
+                            star_rating = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
+                                    review_id=review_id)).get_attribute('title')
+                            logger.info("review_star: " + star_rating)
+
+                            review_date_info_list = review_date_info.split(' ')
+                            logger.info(review_date_info_list)
+                            review_date_year = review_date_info_list[-1]
+                            logger.info(review_date_year)
+                            review_date_day = review_date_info_list[-2][:-1]
+                            logger.info(review_date_day)
+                            logger.info(review_date_info_list[-3])
+                            review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
+                            logger.info(review_date_month)
+                            review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
+                            logger.info("review_date: " + review_date)
+                            review_text = self.driver.find_element_by_xpath(
+                                '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
                                     review_id=review_id)).text
-                        logger.info("reviewer_name: " + reviewer_name)
-                        review_title = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/div[2]/a[2]/span'.format(
-                                review_id=review_id)).text
-                        logger.info("review_title: " + review_title)
-                        star_rating = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
-                                review_id=review_id)).get_attribute('title')
-                        logger.info("review_star: " + star_rating)
+                            logger.info("review_text: " + review_text)
+                            review_image = 'no'
+                            try:
+                                review_image = self.driver.find_element_by_xpath(
+                                    '//*[@id="{review_id}_imageSection_main"]/div[1]/img'.format(
+                                        review_id=review_id)).get_attribute('src')
 
-                        review_date_info_list = review_date_info.split(' ')
-                        logger.info(review_date_info_list)
-                        review_date_year = review_date_info_list[-1]
-                        logger.info(review_date_year)
-                        review_date_day = review_date_info_list[-2][:-1]
-                        logger.info(review_date_day)
-                        logger.info(review_date_info_list[-3])
-                        review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
-                        logger.info(review_date_month)
-                        review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
-                        logger.info("review_date: " + review_date)
-                        review_text = self.driver.find_element_by_xpath(
-                            '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
-                                review_id=review_id)).text
-                        logger.info("review_text: " + review_text)
-                        review_image = 'no'
-                        try:
-                            review_image = self.driver.find_element_by_xpath(
-                                '//*[@id="{review_id}_imageSection_main"]/div[1]/img'.format(
-                                    review_id=review_id)).get_attribute('src')
+                            except Exception as e:
+                                print(e)
+                            review_video = 'no'
+                            try:
+                                review_video = self.driver.find_element_by_xpath(
+                                    '//*[@id="video-block-{review_id}"]/div/div[1]/video'.format(
+                                        review_id=review_id)).get_attribute('src')
 
-                        except Exception as e:
-                            print(e)
-                        review_video = 'no'
-                        try:
-                            review_video = self.driver.find_element_by_xpath(
-                                '//*[@id="video-block-{review_id}"]/div/div[1]/video'.format(
-                                    review_id=review_id)).get_attribute('src')
+                            except Exception as e:
+                                print(e)
 
-                        except Exception as e:
-                            print(e)
+                            verified = '0'
+                            try:
+                                if self.driver.find_element_by_xpath(
+                                    '//*[@id="customer_review-{review_id}"]/div[3]/span/a/span'.format(
+                                        review_id=review_id)).text == 'Verified Purchase':
+                                    verified = '1'
+                            except Exception as e:
+                                print(e)
+                            logger.info("verified: " + verified)
 
-                        verified = '0'
-                        try:
-                            if self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[3]/span/a/span'.format(
-                                    review_id=review_id)).text == 'Verified Purchase':
-                                verified = '1'
-                        except Exception as e:
-                            print(e)
-                        logger.info("verified: " + verified)
+                            time.sleep(random.randint(5, 10))
 
-                        time.sleep(random.randint(5, 10))
-
-                        data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
-                                'verified_purchase': verified, 'review_text': review_text, 'review_rating': star_rating,
-                                'review_date': review_date, 'image': review_image, 'video': review_video,
-                                'review_link': review_link, 'country': review_country, "review_exist": "1"}
-                        # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
+                            data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
+                                    'verified_purchase': verified, 'review_text': review_text, 'review_rating': star_rating,
+                                    'review_date': review_date, 'image': review_image, 'video': review_video,
+                                    'review_link': review_link, 'country': review_country, "review_exist": "1"}
+                            # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
 
 
-                        logger.info("review_image: " + review_image)
-                        logger.info("review_video: " + review_video)
-                        res = requests.post('https://300gideon.com/review/info', data=data)
+                            logger.info("review_image: " + review_image)
+                            logger.info("review_video: " + review_video)
+                            res = requests.post('https://300gideon.com/review/info', data=data)
 
-                        logger.info(res.text)
-                        if res.text[0] == 'Y':
-                            record_flag = record_flag + 1
-                        if record_flag > 20:
-                            break
-                        logger.info(record_flag)
+                            logger.info(res.text)
+                            if res.text[0] == 'Y':
+                                record_flag = record_flag + 1
+                            if record_flag > 20:
+                                break
+                            logger.info(record_flag)
 
-                        time.sleep(random.randint(5, 10))
-                        self.driver.close()
-                        self.driver.switch_to.window(self.driver.window_handles[1])
-                        time.sleep(random.randint(5, 10))
+                            time.sleep(random.randint(5, 10))
+                            self.driver.close()
+                            self.driver.switch_to.window(self.driver.window_handles[1])
+                            time.sleep(random.randint(5, 10))
             self.driver.close()
         except Exception as e:
             self.save_page(traceback.format_exc())
