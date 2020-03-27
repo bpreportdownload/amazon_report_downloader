@@ -43,7 +43,7 @@ def download_report(report):
             downloader = Download(driver)
             logger.info(seller_id)
             try:
-                downloader.review_info_scrapy(domain, seller_id, 1, 2)
+                downloader.review_info_scrapy(domain, seller_id, 1, 5)
                 downloader.close_webdriver()
             except Exception as e:
                 downloader.save_page(e)

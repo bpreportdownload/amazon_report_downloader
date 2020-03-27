@@ -175,7 +175,7 @@ class Download(object):
             self.driver.get(
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
-            time.sleep(random.randint(4, 7))
+            time.sleep(random.randint(1, 4))
             items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
             ASINs = []
             for item in items[0:-1]:
@@ -189,12 +189,12 @@ class Download(object):
                 logger.info(ASIN)
                 record_flag = 0
                 self.driver.execute_script("window.open('');")
-                time.sleep(random.randint(5, 10))
+                time.sleep(random.randint(1, 5))
 
                 # Switch to the new window
                 self.driver.switch_to.window(self.driver.window_handles[1])
                 self.driver.get(listing_base + ASIN)
-                time.sleep(random.randint(5, 10))
+                time.sleep(random.randint(1, 5))
                 if self.driver.page_source.find('Fulfilled by Amazon') < 0:
                     logger.info('ASIN: ' + ASIN + ' is not FBA')
                     self.driver.close()
@@ -228,6 +228,10 @@ class Download(object):
                         logger.info("review_id: " + review_id)
                         review_ids.append(review_id)
                     time.sleep(random.randint(5, 10))
+
+                    # there is no reviews
+                    if len(review_ids) == 0:
+                        break
 
                     for review_id in review_ids:
                         logger.info("review_id: " + review_id)
