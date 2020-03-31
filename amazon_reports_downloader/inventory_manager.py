@@ -247,7 +247,7 @@ class Download(object):
                             self.driver.get(review_link)
                             time.sleep(random.randint(1, 5))
                             try:
-                                page_not_found = self.driver.find_element_by_selector('#g > div > a > img').get_attribute('alter')
+                                page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute('alter')
                                 if page_not_found[0] == 'S':
                                     continue
                             except Exception as e:
@@ -294,6 +294,14 @@ class Download(object):
                             logger.info(review_date_month)
                             review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
+                            try:
+                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                    self.driver.close()
+                                    self.driver.switch_to.window(self.driver.window_handles[1])
+                                    break
+                            except Exception as e:
+                                logger.info("date error")
+                                print(e)
                             review_text = self.driver.find_element_by_xpath(
                                 '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
                                     review_id=review_id)).text
@@ -1038,7 +1046,7 @@ class Download(object):
             self.driver.execute_script(create_report)
 
             logger.info('click create report')
-            time.sleep(random.randint(100, 200))
+            time.sleep(random.randint(10, 20))
 
             # click download
             # 移动鼠标到reports
@@ -1075,6 +1083,14 @@ class Download(object):
 
             # click download reports
 
+            for i in range(30):
+                report_status = self.driver.find_element_by_xpath('//*[@id="advertising-reports"]/div/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/div/div/p').text
+                logger.info(report_status)
+                if report_status == "Completed":
+                    break
+                else:
+                    self.driver.refresh()
+                    time.sleep(random.randint(10, 15))
             js_click_download = "document.querySelector('#advertising-reports > div > div > div > div.ReactTable > div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(2) > span > a').click();"
             self.driver.execute_script(js_click_download)
             logger.info('click download')
@@ -1315,256 +1331,255 @@ class Download(object):
         return file_name
 
     def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
-
-        rootdir = os.path.expanduser('~/Downloads/')
-        logger.info(rootdir)
-        file_path = rootdir + file_name
-        logger.info(file_path)
-        logger.info("gideon login")
-
         try:
+
+            rootdir = os.path.expanduser('~/Downloads/')
+            logger.info(rootdir)
+            file_path = rootdir + file_name
+            logger.info(file_path)
+            logger.info("gideon login")
+
             js = 'window.open("https://300gideon.com/login");'
             self.driver.execute_script(js)
 
             handles = self.driver.window_handles
             self.driver.switch_to_window(handles[1])
-        except Exception as e:
-            print(e)
+            try:
+                email_input_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['email'])))
+                email_input_elem.clear()
+                email_input_elem.send_keys(email)
+                logger.info("put password")
+                password_input_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['password'])))
+                password_input_elem.clear()
+                password_input_elem.send_keys(password)
+                login_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['login'])))
+                login_elem.click()
+            except Exception as e:
+                print(e)
 
-        try:
-            email_input_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['email'])))
-            email_input_elem.clear()
-            email_input_elem.send_keys(email)
-            logger.info("put password")
-            password_input_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['password'])))
-            password_input_elem.clear()
-            password_input_elem.send_keys(password)
-            login_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['login'])))
-            login_elem.click()
-        except Exception as e:
-            print(e)
-        time.sleep(4)
+            time.sleep(4)
 
-        logger.info("upload file to gideon")
-        self.driver.get(url)
+            logger.info("upload file to gideon")
+            self.driver.get(url)
 
-        if file_type == "orders_file":
+            if file_type == "orders_file":
 
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['order_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['order_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
 
-            logger.info("file_upload")
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['orders_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['orders_import']))).click()
 
-        if file_type == "order_shipments_file":
+            if file_type == "order_shipments_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
 
-            self.scroll_down()
-            time.sleep(random.randint(1, 5))
+                self.scroll_down()
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_shipments_import']))).click()
 
-        if file_type == "finances_file":
+            if file_type == "finances_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['finance_import']))).click()
 
-        if file_type == "ads_file":
+            if file_type == "ads_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['ads_import']))).click()
 
-        if file_type == "campaigns_file":
+            if file_type == "campaigns_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("select report date")
-            date_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
-            date_elem.value = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-            logger.info(date_elem.value)
-            time.sleep(5)
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("select report date")
+                date_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
+                date_elem.value = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+                logger.info(date_elem.value)
+                time.sleep(5)
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_import']))).click()
 
-        if file_type == "searchterms_file":
+            if file_type == "searchterms_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            self.scroll_down()
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_import']))).click()
+                logger.info("file import")
+                self.scroll_down()
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['searchterms_import']))).click()
 
-        if file_type == "listings_file":
+            if file_type == "listings_file":
 
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['listings_import']))).click()
 
-        if file_type == "inventory_file":
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+            if file_type == "inventory_file":
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['FBA_inventory_import']))).click()
 
-        if file_type == "business_file":
-            logger.info("select seller")
-            seller_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_seller_selector'])))
-            Select(seller_elem).select_by_value(seller_id)
+            if file_type == "business_file":
+                logger.info("select seller")
+                seller_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_seller_selector'])))
+                Select(seller_elem).select_by_value(seller_id)
 
-            logger.info("select report date")
-            date_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_date'])))
-            date_elem.value = datetime.datetime.utcnow().date().strftime("%Y-%m-%d")
+                logger.info("select report date")
+                date_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_date'])))
+                date_elem.value = datetime.datetime.utcnow().date().strftime("%Y-%m-%d")
 
-            logger.info("select country")
-            country_elem = WebDriverWait(self.driver, 7).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_country'])))
-            Select(country_elem).select_by_value(country)
+                logger.info("select country")
+                country_elem = WebDriverWait(self.driver, 7).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_country'])))
+                Select(country_elem).select_by_value(country)
 
-            logger.info("file_upload")
-            file_upload = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.ID, file_type))
-            )
-            file_upload.send_keys(file_path)
-            time.sleep(random.randint(1, 5))
+                logger.info("file_upload")
+                file_upload = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, file_type))
+                )
+                file_upload.send_keys(file_path)
+                time.sleep(random.randint(1, 5))
 
-            logger.info("file import")
-            WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
+                logger.info("file import")
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_import']))).click()
 
-        try:
+
             time.sleep(random.randint(20, 30))
             self.driver.close()
             self.driver.switch_to_window(handles[0])
             os.remove(file_path)
         except Exception as e:
+            self.save_page(traceback.format_exc())
             print(e)
             self.driver.quit()
 
