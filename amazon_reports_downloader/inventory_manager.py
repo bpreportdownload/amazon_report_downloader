@@ -235,6 +235,8 @@ class Download(object):
 
                     for review_id in review_ids:
                         logger.info("review_id: " + review_id)
+                        if len(review_id) < 1:
+                            continue
                         if review_id[0] == 'R':
                             review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
                                 marketplace=marketplace, review_id=review_id)
