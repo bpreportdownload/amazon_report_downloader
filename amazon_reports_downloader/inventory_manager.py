@@ -210,11 +210,11 @@ class Download(object):
 
                     today = datetime.date.today()
 
-                    # self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
-                    # self.driver.find_element_by_id('sort-order-dropdown_1').click()
-                    # time.sleep(random.randint(5, 10))
-                    # self.driver.refresh()
-                    # time.sleep(random.randint(5, 10))
+                    self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
+                    self.driver.find_element_by_id('sort-order-dropdown_1').click()
+                    time.sleep(random.randint(5, 10))
+                    self.driver.refresh()
+                    time.sleep(random.randint(5, 10))
 
                     try:
 
@@ -283,13 +283,13 @@ class Download(object):
 
                             review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
-                            # try:
-                            #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
-                            #         self.driver.close()
-                            #         break
-                            # except Exception as e:
-                            #     logger.info("date error")
-                            #     print(e)
+                            try:
+                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                    self.driver.close()
+                                    break
+                            except Exception as e:
+                                logger.info("date error")
+                                print(e)
 
                             review_text = review.find(attrs={'data-hook': 'review-body'}).text
                             try:

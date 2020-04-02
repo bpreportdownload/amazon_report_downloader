@@ -42,12 +42,13 @@ def download_report(report):
             domain = 'ca'
         if report == 'review_info':
             downloader = Download(driver)
-            logger.info(seller_id)
-            try:
-                downloader.review_info_scrapy(domain, seller_id, seller_profit_domain)
-                downloader.close_webdriver()
-            except Exception as e:
-                downloader.save_page(e)
+            for seller_id in config['account']['seller_ids']:
+                logger.info(seller_id)
+                try:
+                    downloader.review_info_scrapy(domain, seller_id, seller_profit_domain)
+                    downloader.close_webdriver()
+                except Exception as e:
+                    downloader.save_page(e)
             continue
 
         if report == 'listing_info':
