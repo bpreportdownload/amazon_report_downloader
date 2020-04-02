@@ -6,4 +6,4 @@ account:
   gideon_email: public@public.com
   gideon_password: public
   seller_id:
-  file_type: inventory_file
+  domain:
