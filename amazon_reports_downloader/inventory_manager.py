@@ -6,6 +6,8 @@ import datetime
 import requests
 import calendar
 import traceback
+from bs4 import BeautifulSoup
+
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -73,7 +75,7 @@ class Download(object):
             'business_report': '',
         }
 
-    def listing_info_scrapy(self, marketplace, seller_id):
+    def listing_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
         try:
             self.driver.get("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
@@ -159,7 +161,7 @@ class Download(object):
                 logger.info("ratings: " + rating)
                 logger.info("star: " + star_rating)
                 today = datetime.date.today()
-                url = "https://300gideon.com/product/update-info"
+                url = "{seller_profit_domain}/product/update-info".format(seller_profit_domain=seller_profit_domain)
                 params = {"asin": ASIN, "sales_ranks": rank, "brand": brand, "small_image": wrap_image, "weight": shipping_weight}
 
                 res = requests.post(url=url, data=params)
@@ -170,7 +172,7 @@ class Download(object):
             self.save_page(traceback.format_exc())
             print(e)
 
-    def review_info_scrapy(self, marketplace, seller_id, s, t):
+    def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
         try:
             self.driver.get(
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
@@ -187,7 +189,6 @@ class Download(object):
 
             for ASIN in ASINs:
                 logger.info(ASIN)
-                record_flag = 0
                 self.driver.execute_script("window.open('');")
                 time.sleep(random.randint(1, 5))
 
@@ -204,59 +205,53 @@ class Download(object):
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
 
-                today = datetime.date.today()
+                while True:
+                    time.sleep(random.randint(10, 20))
 
-                self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
-                self.driver.find_element_by_id('sort-order-dropdown_1').click()
-                time.sleep(random.randint(5, 10))
-                self.driver.refresh()
-                time.sleep(random.randint(5, 10))
+                    today = datetime.date.today()
 
-                for i in range(int(s), int(t)):
-                    logger.info("page index: " + str(i))
-                    self.driver.get(
-                        reviews_base + ASIN + '/ref=cm_cr_getr_d_paging_btm_next_{next_page}?ie=UTF8&reviewerType=all_reviews&pageNumber={page}&sortBy=recent'.format(
-                            next_page=i, page=i))
-                    time.sleep(random.randint(5, 10))
+                    # self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
+                    # self.driver.find_element_by_id('sort-order-dropdown_1').click()
+                    # time.sleep(random.randint(5, 10))
+                    # self.driver.refresh()
+                    # time.sleep(random.randint(5, 10))
 
-                    review_list = self.driver.find_elements_by_xpath('//*[@id="cm_cr-review_list"]/div')
-                    reviews = review_list[0:10]
-                    review_ids = []
+                    try:
 
-                    for review in reviews:
-                        review_id = review.get_attribute('id')
-                        logger.info("review_id: " + review_id)
-                        review_ids.append(review_id)
-                    time.sleep(random.randint(5, 10))
+                        try:
+                            page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute(
+                                'alter')
+                            if page_not_found[0] == 'S':
+                                continue
+                        except Exception as e:
+                            print(e)
 
-                    # there is no reviews
-                    if len(review_ids) == 0:
-                        break
+                        soup = BeautifulSoup(self.driver.page_source, 'lxml')
 
-                    for review_id in review_ids:
-                        logger.info("review_id: " + review_id)
-                        if len(review_id) < 1:
-                            continue
-                        if review_id[0] == 'R':
-                            review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
-                                marketplace=marketplace, review_id=review_id)
-                            self.driver.execute_script("window.open('');")
-                            time.sleep(random.randint(1, 5))
+                        review_list = soup.select('#cm_cr-review_list > div')
 
-                            # Switch to the new window
-                            self.driver.switch_to.window(self.driver.window_handles[2])
-                            time.sleep(random.randint(1, 5))
-                            self.driver.get(review_link)
-                            time.sleep(random.randint(1, 5))
+                        if len(review_list) < 3:
+                            break
+                        reviews = review_list[0:-1]
+                        logger.info(len(reviews))
+
+                        for review in reviews:
+                            logger.info(type(review))
                             try:
-                                page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute('alter')
-                                if page_not_found[0] == 'S':
+                                review_id = review.attrs['id']
+                                logger.info("review_id: " + review_id)
+                                if len(review_id) < 1:
+                                    continue
+                                if review_id[0] != 'R':
                                     continue
                             except Exception as e:
                                 print(e)
+                                continue
+                            review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
+                                    marketplace=marketplace, review_id=review_id)
+                            time.sleep(random.randint(5, 10))
 
-                            review_date_info = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/span'.format(review_id=review_id)).text
+                            review_date_info = review.find(attrs={'data-hook': 'review-date'}).text
                             us_index = review_date_info.find('United States')
                             ca_index = review_date_info.find('Canada')
                             uk_index = review_date_info.find('United Kingdom')
@@ -268,68 +263,57 @@ class Download(object):
                             if uk_index > 0:
                                 review_country = 'UK'
                             try:
-                                reviewer_name = self.driver.find_element_by_xpath(
-                                    '//*[@id="customer_review-{review_id}"]/div[1]/a/div[2]/span'.format(
-                                        review_id=review_id)).text
+                                reviewer_name = review.find(attrs={'class': 'a-profile-name'}).text
                             except Exception as e:
-                                reviewer_name = self.driver.find_element_by_xpath(
-                                    '//*[@id="customer_review-{review_id}"]/div[1]/div[1]/div/a/div[2]/span'.format(
-                                        review_id=review_id)).text
+                                print(e)
                             logger.info("reviewer_name: " + reviewer_name)
-                            review_title = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[2]/a[2]/span'.format(
-                                    review_id=review_id)).text
-                            logger.info("review_title: " + review_title)
-                            star_rating = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[2]/a[1]'.format(
-                                    review_id=review_id)).get_attribute('title')
+
+                            star_rating = review.find(attrs={'class': 'a-icon-alt'}).text
                             logger.info("review_star: " + star_rating)
+                            review_title = review.find('a', attrs={'data-hook': 'review-title'}).text.strip()
+                            logger.info("review_title: " + review_title)
 
                             review_date_info_list = review_date_info.split(' ')
-                            logger.info(review_date_info_list)
+
                             review_date_year = review_date_info_list[-1]
-                            logger.info(review_date_year)
+
                             review_date_day = review_date_info_list[-2][:-1]
-                            logger.info(review_date_day)
-                            logger.info(review_date_info_list[-3])
+
                             review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
-                            logger.info(review_date_month)
+
                             review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
+                            # try:
+                            #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                            #         self.driver.close()
+                            #         break
+                            # except Exception as e:
+                            #     logger.info("date error")
+                            #     print(e)
+
+                            review_text = review.find(attrs={'data-hook': 'review-body'}).text
                             try:
-                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
-                                    self.driver.close()
-                                    self.driver.switch_to.window(self.driver.window_handles[1])
-                                    break
+                                review_text = review_text.split("Install Flash Player ")[-1].strip()
                             except Exception as e:
-                                logger.info("date error")
                                 print(e)
-                            review_text = self.driver.find_element_by_xpath(
-                                '//*[@id="customer_review-{review_id}"]/div[4]/span/span'.format(
-                                    review_id=review_id)).text
                             logger.info("review_text: " + review_text)
                             review_image = 'no'
                             try:
-                                review_image = self.driver.find_element_by_xpath(
-                                    '//*[@id="{review_id}_imageSection_main"]/div[1]/img'.format(
-                                        review_id=review_id)).get_attribute('src')
-
+                                review_image = review.find(attrs={'class': 'review-image-tile'}).attrs['src']
+                                logger.info(review_image)
                             except Exception as e:
                                 print(e)
                             review_video = 'no'
                             try:
-                                review_video = self.driver.find_element_by_xpath(
-                                    '//*[@id="video-block-{review_id}"]/div/div[1]/video'.format(
-                                        review_id=review_id)).get_attribute('src')
+                                review_video = review.find('video').attrs['src']
+                                logger.info(review_video)
 
                             except Exception as e:
                                 print(e)
 
                             verified = '0'
                             try:
-                                if self.driver.find_element_by_xpath(
-                                    '//*[@id="customer_review-{review_id}"]/div[3]/span/a/span'.format(
-                                        review_id=review_id)).text == 'Verified Purchase':
+                                if review.find(attrs={'class': 'a-size-mini a-color-state a-text-bold'}).text == 'Verified Purchase':
                                     verified = '1'
                             except Exception as e:
                                 print(e)
@@ -343,22 +327,20 @@ class Download(object):
                                     'review_link': review_link, 'country': review_country, "review_exist": "1"}
                             # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
 
-
                             logger.info("review_image: " + review_image)
                             logger.info("review_video: " + review_video)
-                            res = requests.post('https://300gideon.com/review/info', data=data)
+                            res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
 
                             logger.info(res.text)
-                            if res.text[0] == 'Y':
-                                record_flag = record_flag + 1
-                            if record_flag > 20:
-                                break
-                            logger.info(record_flag)
+                        try:
+                            js_click_next_page = "document.querySelector('#cm_cr-pagination_bar > ul > li.a-last > a').click();"
+                            self.driver.execute_script(js_click_next_page)
+                        except Exception as e:
+                            print(e)
+                            break
 
-                            time.sleep(random.randint(5, 10))
-                            self.driver.close()
-                            self.driver.switch_to.window(self.driver.window_handles[1])
-                            time.sleep(random.randint(5, 10))
+                    except Exception as e:
+                        print(e)
             self.driver.close()
         except Exception as e:
             self.save_page(traceback.format_exc())
@@ -1332,7 +1314,7 @@ class Download(object):
             self.driver.quit()
         return file_name
 
-    def upload_files(self, url, file_name, email, password, seller_id, file_type, country):
+    def upload_files(self, url, file_name, email, password, seller_id, file_type, country, seller_profit_domain):
         try:
 
             rootdir = os.path.expanduser('~/Downloads/')
@@ -1341,7 +1323,7 @@ class Download(object):
             logger.info(file_path)
             logger.info("gideon login")
 
-            js = 'window.open("https://300gideon.com/login");'
+            js = 'window.open("{seller_profit_domain}/login");'.format(seller_profit_domain=seller_profit_domain)
             self.driver.execute_script(js)
 
             handles = self.driver.window_handles
