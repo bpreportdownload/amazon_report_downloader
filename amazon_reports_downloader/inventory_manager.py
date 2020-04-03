@@ -204,7 +204,7 @@ class Download(object):
 
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
-
+                date_flag = False
                 while True:
                     time.sleep(random.randint(10, 20))
 
@@ -284,8 +284,11 @@ class Download(object):
                             review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
                             try:
-                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 2:
                                     self.driver.close()
+                                    handles = self.driver.window_handles
+                                    self.driver.switch_to_window(handles[0])
+                                    date_flag = True
                                     break
                             except Exception as e:
                                 logger.info("date error")
@@ -332,11 +335,16 @@ class Download(object):
                             res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
 
                             logger.info(res.text)
-                        try:
-                            js_click_next_page = "document.querySelector('#cm_cr-pagination_bar > ul > li.a-last > a').click();"
-                            self.driver.execute_script(js_click_next_page)
-                        except Exception as e:
-                            print(e)
+                        logger.info(date_flag)
+
+                        if not date_flag:
+                            try:
+                                js_click_next_page = "document.querySelector('#cm_cr-pagination_bar > ul > li.a-last > a').click();"
+                                self.driver.execute_script(js_click_next_page)
+                            except Exception as e:
+                                print(e)
+                                break
+                        else:
                             break
 
                     except Exception as e:
@@ -1571,21 +1579,25 @@ class Download(object):
         self.driver.quit()
 
     def save_page(self, ex):
+        try:
+            logger.info('begin to save page')
+            file_name = time.strftime("%b_%d_%a_%H_%M_%S", time.localtime()) + '.html'
+            current_path = os.getcwd()
+            file_path = current_path + '\\logs\\' + file_name
 
-        logger.info('begin to save page')
-        file_name = time.strftime("%b_%d_%a_%H_%M_%S", time.localtime()) + '.html'
-        current_path = os.getcwd()
-        file_path = current_path + '\\logs\\' + file_name
-        f = open(file_path, 'w', encoding='utf-8')
-        f.write(self.driver.page_source)
-        f.close()
+            if not os.path.exists(current_path + '\\logs\\'):
+                os.makedirs(current_path + '\\logs\\')
+            f = open(file_path, 'w', encoding='utf-8')
+            f.write(self.driver.page_source)
+            f.close()
 
-        log_path = current_path + '\\logs\\' + 'log.txt'
+            log_path = current_path + '\\logs\\' + 'log.txt'
 
-        f = open(log_path, 'a', encoding='utf-8')
-        f.write(ex)
-        f.write(time.strftime("%b %d %a %H:%M:%S", time.localtime()) + '----------------------------------------------------------------' + '\n')
-        f.close()
-        logger.info('page save done')
-        time.sleep(random.randint(5, 10))
-
+            f = open(log_path, 'a', encoding='utf-8')
+            f.write(ex)
+            f.write(time.strftime("%b %d %a %H:%M:%S", time.localtime()) + '----------------------------------------------------------------' + '\n')
+            f.close()
+            logger.info('page save done')
+            time.sleep(random.randint(5, 10))
+        except Exception as e:
+            print(e)
