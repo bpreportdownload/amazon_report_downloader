@@ -204,20 +204,24 @@ class Download(object):
 
                 logger.info(reviews_base + ASIN)
                 self.driver.get(reviews_base + ASIN)
+                time.sleep(random.randint(5, 10))
+                review_rating_text = self.driver.find_element_by_xpath('//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span').text.strip()
+                logger.info(review_rating_text)
+                if review_rating_text[0] == '0':
+                    logger.info('ASIN: ' + ASIN + ' is no review')
+                    self.driver.close()
+                    self.driver.switch_to.window(self.driver.window_handles[0])
+                    continue
                 date_flag = False
+                today = datetime.date.today()
+
+                self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
+                self.driver.find_element_by_id('sort-order-dropdown_1').click()
+                time.sleep(random.randint(5, 10))
+                self.driver.refresh()
                 while True:
                     time.sleep(random.randint(10, 20))
-
-                    today = datetime.date.today()
-
-                    self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
-                    self.driver.find_element_by_id('sort-order-dropdown_1').click()
-                    time.sleep(random.randint(5, 10))
-                    self.driver.refresh()
-                    time.sleep(random.randint(5, 10))
-
                     try:
-
                         try:
                             page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute(
                                 'alter')
@@ -283,16 +287,16 @@ class Download(object):
 
                             review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                             logger.info("review_date: " + review_date)
-                            try:
-                                if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 2:
-                                    self.driver.close()
-                                    handles = self.driver.window_handles
-                                    self.driver.switch_to_window(handles[0])
-                                    date_flag = True
-                                    break
-                            except Exception as e:
-                                logger.info("date error")
-                                print(e)
+                            # try:
+                            #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
+                            #         self.driver.close()
+                            #         handles = self.driver.window_handles
+                            #         self.driver.switch_to_window(handles[0])
+                            #         date_flag = True
+                            #         break
+                            # except Exception as e:
+                            #     logger.info("date error")
+                            #     print(e)
 
                             review_text = review.find(attrs={'data-hook': 'review-body'}).text
                             try:
@@ -349,7 +353,7 @@ class Download(object):
 
                     except Exception as e:
                         print(e)
-            self.driver.close()
+            # self.driver.close()
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)

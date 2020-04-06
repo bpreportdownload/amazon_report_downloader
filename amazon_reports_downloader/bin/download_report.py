@@ -37,19 +37,21 @@ def download_report(report):
         seller_id = config['account']['seller_id']
         seller_profit_domain = config['account']['domain']
         driver = get_shared_driver(marketplace)
+        downloader = Download(driver)
         domain = 'com'
         if marketplace == 'ca':
             domain = 'ca'
         if report == 'review_info':
-            downloader = Download(driver)
+
             for seller_id in config['account']['seller_ids']:
+
                 logger.info(seller_id)
                 try:
                     downloader.review_info_scrapy(domain, seller_id, seller_profit_domain)
-                    downloader.close_webdriver()
                 except Exception as e:
                     downloader.save_page(e)
             continue
+            downloader.close_webdriver()
 
         if report == 'listing_info':
             downloader = Download(driver)
