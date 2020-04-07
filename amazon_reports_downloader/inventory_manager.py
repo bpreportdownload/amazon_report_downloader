@@ -172,8 +172,10 @@ class Download(object):
             self.save_page(traceback.format_exc())
             print(e)
 
-    def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
+    def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain, record_file):
         try:
+            if self.check_seller(seller_id):
+                return
             self.driver.get(
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
@@ -188,172 +190,197 @@ class Download(object):
             reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
 
             for ASIN in ASINs:
-                logger.info(ASIN)
-                self.driver.execute_script("window.open('');")
-                time.sleep(random.randint(1, 5))
+                try:
+                    logger.info(ASIN)
+                    if ASIN in record_file["done_asins"]:
+                        logger.info(ASIN + "is down")
+                        return
+                    window_handles = self.driver.window_handles
+                    if window_handles > 2:
+                        for i in range(2, window_handles):
+                            self.driver.switch_to.window(self.driver.window_handles[i])
+                            self.driver.close()
+                            time.sleep(random.randint(1, 5))
 
-                # Switch to the new window
-                self.driver.switch_to.window(self.driver.window_handles[1])
-                self.driver.get(listing_base + ASIN)
-                time.sleep(random.randint(1, 5))
-                if self.driver.page_source.find('Fulfilled by Amazon') < 0:
-                    logger.info('ASIN: ' + ASIN + ' is not FBA')
-                    self.driver.close()
-                    self.driver.switch_to.window(self.driver.window_handles[0])
-                    continue
+                    if window_handles == 0:
+                        logger.info("open a new window")
+                        self.driver.execute_script("window.open('');")
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+                    if window_handles == 1:
+                        self.driver.execute_script("window.open('');")
+                        self.driver.switch_to.window(self.driver.window_handles[1])
+                    if window_handles == 2:
+                        self.driver.switch_to.window(self.driver.window_handles[1])
 
-                logger.info(reviews_base + ASIN)
-                self.driver.get(reviews_base + ASIN)
-                time.sleep(random.randint(5, 10))
-                review_rating_text = self.driver.find_element_by_xpath('//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span').text.strip()
-                logger.info(review_rating_text)
-                if review_rating_text[0] == '0':
-                    logger.info('ASIN: ' + ASIN + ' is no review')
-                    self.driver.close()
-                    self.driver.switch_to.window(self.driver.window_handles[0])
-                    continue
-                date_flag = False
-                today = datetime.date.today()
+                    time.sleep(random.randint(1, 5))
 
-                self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
-                self.driver.find_element_by_id('sort-order-dropdown_1').click()
-                time.sleep(random.randint(5, 10))
-                self.driver.refresh()
-                while True:
-                    time.sleep(random.randint(10, 20))
-                    try:
+
+                    self.driver.get(listing_base + ASIN)
+                    time.sleep(random.randint(1, 5))
+                    if self.driver.page_source.find('Fulfilled by Amazon') < 0:
+                        logger.info('ASIN: ' + ASIN + ' is not FBA')
+                        record_file["done_asins"].append(ASIN)
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+                        continue
+
+                    logger.info(reviews_base + ASIN)
+                    self.driver.get(reviews_base + ASIN)
+                    time.sleep(random.randint(5, 10))
+                    review_rating_text = self.driver.find_element_by_xpath('//*[@id="cm_cr-product_info"]/div/div[1]/div[2]/div/div/div[2]/div/span').text.strip()
+                    logger.info(review_rating_text)
+                    if review_rating_text[0] == '0':
+                        logger.info('ASIN: ' + ASIN + ' is no review')
+                        self.driver.close()
+                        self.driver.switch_to.window(self.driver.window_handles[0])
+                        continue
+                    date_flag = False
+                    today = datetime.date.today()
+
+                    self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
+                    self.driver.find_element_by_id('sort-order-dropdown_1').click()
+                    time.sleep(random.randint(5, 10))
+                    self.driver.refresh()
+                    while True:
+                        time.sleep(random.randint(10, 20))
                         try:
-                            page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute(
-                                'alter')
-                            if page_not_found[0] == 'S':
-                                continue
+                            try:
+                                page_not_found = self.driver.find_element_by_xpath('//*[@id="g"]/div/a/img').get_attribute(
+                                    'alter')
+                                if page_not_found[0] == 'S':
+                                    continue
+                            except Exception as e:
+                                print(e)
+
+                            soup = BeautifulSoup(self.driver.page_source, 'lxml')
+
+                            review_list = soup.select('#cm_cr-review_list > div')
+
+                            if len(review_list) < 3:
+                                break
+                            reviews = review_list[0:-1]
+                            logger.info(len(reviews))
+
+                            for review in reviews:
+                                logger.info(type(review))
+                                try:
+                                    review_id = review.attrs['id']
+                                    logger.info("review_id: " + review_id)
+                                    if len(review_id) < 1:
+                                        continue
+                                    if review_id[0] != 'R':
+                                        continue
+                                except Exception as e:
+                                    print(e)
+                                    continue
+                                review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
+                                        marketplace=marketplace, review_id=review_id)
+                                time.sleep(random.randint(5, 10))
+
+                                review_date_info = review.find(attrs={'data-hook': 'review-date'}).text
+                                us_index = review_date_info.find('United States')
+                                ca_index = review_date_info.find('Canada')
+                                uk_index = review_date_info.find('United Kingdom')
+                                review_country = 'US'
+                                if us_index > 0:
+                                    review_country = 'US'
+                                if ca_index > 0:
+                                    review_country = 'CA'
+                                if uk_index > 0:
+                                    review_country = 'UK'
+                                try:
+                                    reviewer_name = review.find(attrs={'class': 'a-profile-name'}).text
+                                except Exception as e:
+                                    print(e)
+                                logger.info("reviewer_name: " + reviewer_name)
+
+                                star_rating = review.find(attrs={'class': 'a-icon-alt'}).text
+                                logger.info("review_star: " + star_rating)
+                                review_title = review.find('a', attrs={'data-hook': 'review-title'}).text.strip()
+                                logger.info("review_title: " + review_title)
+
+                                review_date_info_list = review_date_info.split(' ')
+
+                                review_date_year = review_date_info_list[-1]
+
+                                review_date_day = review_date_info_list[-2][:-1]
+
+                                review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
+
+                                review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
+                                logger.info("review_date: " + review_date)
+                                # try:
+                                #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
+                                #         self.driver.close()
+                                #         handles = self.driver.window_handles
+                                #         self.driver.switch_to_window(handles[0])
+                                #         date_flag = True
+                                #         break
+                                # except Exception as e:
+                                #     logger.info("date error")
+                                #     print(e)
+
+                                review_text = review.find(attrs={'data-hook': 'review-body'}).text
+                                try:
+                                    review_text = review_text.split("Install Flash Player ")[-1].strip()
+                                except Exception as e:
+                                    print(e)
+                                logger.info("review_text: " + review_text)
+                                review_image = 'no'
+                                try:
+                                    review_image = review.find(attrs={'class': 'review-image-tile'}).attrs['src']
+                                    logger.info(review_image)
+                                except Exception as e:
+                                    print(e)
+                                review_video = 'no'
+                                try:
+                                    review_video = review.find('video').attrs['src']
+                                    logger.info(review_video)
+
+                                except Exception as e:
+                                    print(e)
+
+                                verified = '0'
+                                try:
+                                    if review.find(attrs={'class': 'a-size-mini a-color-state a-text-bold'}).text == 'Verified Purchase':
+                                        verified = '1'
+                                except Exception as e:
+                                    print(e)
+                                logger.info("verified: " + verified)
+
+                                time.sleep(random.randint(5, 10))
+
+                                data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
+                                        'verified_purchase': verified, 'review_text': review_text, 'review_rating': star_rating,
+                                        'review_date': review_date, 'image': review_image, 'video': review_video,
+                                        'review_link': review_link, 'country': review_country, "review_exist": "1"}
+                                # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
+
+                                logger.info("review_image: " + review_image)
+                                logger.info("review_video: " + review_video)
+                                res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
+
+                                logger.info(res.text)
+                            logger.info(date_flag)
+
+                            if not date_flag:
+                                try:
+                                    js_click_next_page = "document.querySelector('#cm_cr-pagination_bar > ul > li.a-last > a').click();"
+                                    self.driver.execute_script(js_click_next_page)
+                                except Exception as e:
+                                    print(e)
+                                    self.add_asin(ASIN)
+                                    break
+                            else:
+                                break
+
                         except Exception as e:
                             print(e)
-
-                        soup = BeautifulSoup(self.driver.page_source, 'lxml')
-
-                        review_list = soup.select('#cm_cr-review_list > div')
-
-                        if len(review_list) < 3:
-                            break
-                        reviews = review_list[0:-1]
-                        logger.info(len(reviews))
-
-                        for review in reviews:
-                            logger.info(type(review))
-                            try:
-                                review_id = review.attrs['id']
-                                logger.info("review_id: " + review_id)
-                                if len(review_id) < 1:
-                                    continue
-                                if review_id[0] != 'R':
-                                    continue
-                            except Exception as e:
-                                print(e)
-                                continue
-                            review_link = 'https://www.amazon.{marketplace}/gp/customer-reviews/{review_id}'.format(
-                                    marketplace=marketplace, review_id=review_id)
-                            time.sleep(random.randint(5, 10))
-
-                            review_date_info = review.find(attrs={'data-hook': 'review-date'}).text
-                            us_index = review_date_info.find('United States')
-                            ca_index = review_date_info.find('Canada')
-                            uk_index = review_date_info.find('United Kingdom')
-                            review_country = 'US'
-                            if us_index > 0:
-                                review_country = 'US'
-                            if ca_index > 0:
-                                review_country = 'CA'
-                            if uk_index > 0:
-                                review_country = 'UK'
-                            try:
-                                reviewer_name = review.find(attrs={'class': 'a-profile-name'}).text
-                            except Exception as e:
-                                print(e)
-                            logger.info("reviewer_name: " + reviewer_name)
-
-                            star_rating = review.find(attrs={'class': 'a-icon-alt'}).text
-                            logger.info("review_star: " + star_rating)
-                            review_title = review.find('a', attrs={'data-hook': 'review-title'}).text.strip()
-                            logger.info("review_title: " + review_title)
-
-                            review_date_info_list = review_date_info.split(' ')
-
-                            review_date_year = review_date_info_list[-1]
-
-                            review_date_day = review_date_info_list[-2][:-1]
-
-                            review_date_month = list(calendar.month_name).index(review_date_info_list[-3])
-
-                            review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
-                            logger.info("review_date: " + review_date)
-                            # try:
-                            #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
-                            #         self.driver.close()
-                            #         handles = self.driver.window_handles
-                            #         self.driver.switch_to_window(handles[0])
-                            #         date_flag = True
-                            #         break
-                            # except Exception as e:
-                            #     logger.info("date error")
-                            #     print(e)
-
-                            review_text = review.find(attrs={'data-hook': 'review-body'}).text
-                            try:
-                                review_text = review_text.split("Install Flash Player ")[-1].strip()
-                            except Exception as e:
-                                print(e)
-                            logger.info("review_text: " + review_text)
-                            review_image = 'no'
-                            try:
-                                review_image = review.find(attrs={'class': 'review-image-tile'}).attrs['src']
-                                logger.info(review_image)
-                            except Exception as e:
-                                print(e)
-                            review_video = 'no'
-                            try:
-                                review_video = review.find('video').attrs['src']
-                                logger.info(review_video)
-
-                            except Exception as e:
-                                print(e)
-
-                            verified = '0'
-                            try:
-                                if review.find(attrs={'class': 'a-size-mini a-color-state a-text-bold'}).text == 'Verified Purchase':
-                                    verified = '1'
-                            except Exception as e:
-                                print(e)
-                            logger.info("verified: " + verified)
-
-                            time.sleep(random.randint(5, 10))
-
-                            data = {'asin': ASIN, 'review_id': review_id, 'title': review_title, 'profile_name': reviewer_name,
-                                    'verified_purchase': verified, 'review_text': review_text, 'review_rating': star_rating,
-                                    'review_date': review_date, 'image': review_image, 'video': review_video,
-                                    'review_link': review_link, 'country': review_country, "review_exist": "1"}
-                            # data = {'asin' : 'B07FB627NR', 'review_id' : 'RGEGRP1HC0MMD', 'title' : 'Excellent price for a LEGO-compatible product', 'author' : 'Dr. Dolly Garnecki', 'verified' : 'Verified Purchase', 'text' : 'This arrived right away. My son was thrilled. He used his own cash to purchase these which he wants to use to build a world map, and then later glue to a coffee table to have his own brick table. These are great for bricks building on top as well as below--works either way. They're sturdy. He tried to bend them to break them, and they had flexibility, but they're not brittle.', 'star_rating' : '5', 'date' : 'March 11, 2019', 'image' : 'src="https://images-na.ssl-images-amazon.com/images/I/81iwr4KCyxL._SY88.jpg"', 'video' : ' '}
-
-                            logger.info("review_image: " + review_image)
-                            logger.info("review_video: " + review_video)
-                            res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
-
-                            logger.info(res.text)
-                        logger.info(date_flag)
-
-                        if not date_flag:
-                            try:
-                                js_click_next_page = "document.querySelector('#cm_cr-pagination_bar > ul > li.a-last > a').click();"
-                                self.driver.execute_script(js_click_next_page)
-                            except Exception as e:
-                                print(e)
-                                break
-                        else:
-                            break
-
-                    except Exception as e:
-                        print(e)
+                except Exception as e:
+                    self.save_page(traceback.format_exc())
+                    print(e)
             # self.driver.close()
+            self.add_seller_id(seller_id)
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
@@ -1605,3 +1632,54 @@ class Download(object):
             time.sleep(random.randint(5, 10))
         except Exception as e:
             print(e)
+
+    def add_asin(self, asin):
+        try:
+            logger.info('begin to add asin')
+            current_path = os.getcwd()
+            file_path = current_path + 'asin.txt'
+            f = open(file_path, 'a', encoding='utf-8')
+            f.write(asin + '\n')
+            f.close()
+            logger.info('asin' + ' ' + asin + ' ' + 'save done')
+            time.sleep(random.randint(5, 10))
+        except Exception as e:
+            print(e)
+
+    def check_asin(self, asin):
+        current_path = os.getcwd()
+        file_path = current_path + 'asin.txt'
+        f = open(file_path, 'r', encoding='utf-8')
+        for asin_done in f:
+            if asin == asin_done.strip():
+                logger.info('asin' + ' ' + asin + ' ' + 'is done')
+                return True
+        f.close()
+        return False
+        logger.info('asin' + ' ' + asin + ' ' + 'is not done yet')
+
+    def check_seller(self, seller_id):
+        current_path = os.getcwd()
+        file_path = current_path + 'seller_id.txt'
+        f = open(file_path, 'r', encoding='utf-8')
+        for seller in f:
+            if seller_id == seller.strip():
+                logger.info('seller' + ' ' + seller_id + ' ' + 'is done')
+                return True
+        f.close()
+        return False
+        logger.info('seller' + ' ' + seller_id + ' ' + 'is not done yet')
+
+    def add_seller_id(self, seller_id):
+        try:
+            logger.info('begin to add seller id')
+            current_path = os.getcwd()
+            file_path = current_path + 'seller_id.txt'
+            f = open(file_path, 'a', encoding='utf-8')
+            f.write(seller_id + '\n')
+            f.close()
+            logger.info('seller id' + ' ' + seller_id + ' ' + 'save done')
+            time.sleep(random.randint(5, 10))
+        except Exception as e:
+            print(e)
+
