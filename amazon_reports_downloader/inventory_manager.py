@@ -1665,4 +1665,16 @@ class Download(object):
         except Exception as e:
             print(e)
 
+    def clear_asin(self):
+        try:
+            current_path = os.getcwd()
+            file_path = current_path + '\\' + 'asin.txt'
+            f = open(file_path, 'r+', encoding='utf-8')
+            f.truncate()
+            f.close()
+            logger.info('clear asins')
+            return False
+        except Exception as e:
+            print(e)
+
 
