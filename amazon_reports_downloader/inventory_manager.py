@@ -172,10 +172,13 @@ class Download(object):
             self.save_page(traceback.format_exc())
             print(e)
 
-    def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain, record_file):
+    def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
         try:
-            if self.check_seller(seller_id):
-                return
+            # try:
+            #     if self.check_seller(seller_id):
+            #         return
+            # except Exception as e:
+            #     print(e)
             self.driver.get(
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
@@ -192,24 +195,27 @@ class Download(object):
             for ASIN in ASINs:
                 try:
                     logger.info(ASIN)
-                    if ASIN in record_file["done_asins"]:
-                        logger.info(ASIN + "is down")
-                        return
+                    try:
+                        if self.check_asin(ASIN):
+                            return
+                    except Exception as e:
+                        print(e)
                     window_handles = self.driver.window_handles
-                    if window_handles > 2:
+                    logger.info(len(window_handles))
+                    if len(window_handles) > 2:
                         for i in range(2, window_handles):
                             self.driver.switch_to.window(self.driver.window_handles[i])
                             self.driver.close()
                             time.sleep(random.randint(1, 5))
 
-                    if window_handles == 0:
+                    if len(window_handles) == 0:
                         logger.info("open a new window")
                         self.driver.execute_script("window.open('');")
                         self.driver.switch_to.window(self.driver.window_handles[0])
-                    if window_handles == 1:
+                    if len(window_handles) == 1:
                         self.driver.execute_script("window.open('');")
                         self.driver.switch_to.window(self.driver.window_handles[1])
-                    if window_handles == 2:
+                    if len(window_handles) == 2:
                         self.driver.switch_to.window(self.driver.window_handles[1])
 
                     time.sleep(random.randint(1, 5))
@@ -219,7 +225,6 @@ class Download(object):
                     time.sleep(random.randint(1, 5))
                     if self.driver.page_source.find('Fulfilled by Amazon') < 0:
                         logger.info('ASIN: ' + ASIN + ' is not FBA')
-                        record_file["done_asins"].append(ASIN)
                         self.driver.close()
                         self.driver.switch_to.window(self.driver.window_handles[0])
                         continue
@@ -1637,7 +1642,7 @@ class Download(object):
         try:
             logger.info('begin to add asin')
             current_path = os.getcwd()
-            file_path = current_path + 'asin.txt'
+            file_path = current_path + '\\' + 'asin.txt'
             f = open(file_path, 'a', encoding='utf-8')
             f.write(asin + '\n')
             f.close()
@@ -1647,34 +1652,40 @@ class Download(object):
             print(e)
 
     def check_asin(self, asin):
-        current_path = os.getcwd()
-        file_path = current_path + 'asin.txt'
-        f = open(file_path, 'r', encoding='utf-8')
-        for asin_done in f:
-            if asin == asin_done.strip():
-                logger.info('asin' + ' ' + asin + ' ' + 'is done')
-                return True
-        f.close()
-        return False
-        logger.info('asin' + ' ' + asin + ' ' + 'is not done yet')
+        try:
+            current_path = os.getcwd()
+            file_path = current_path + '\\' + 'asin.txt'
+            f = open(file_path, 'r', encoding='utf-8')
+            for asin_done in f:
+                if asin == asin_done.strip():
+                    logger.info('asin' + ' ' + asin + ' ' + 'is done')
+                    return True
+            f.close()
+            logger.info('asin' + ' ' + asin + ' ' + 'is not done yet')
+            return False
+        except Exception as e:
+            print(e)
 
     def check_seller(self, seller_id):
-        current_path = os.getcwd()
-        file_path = current_path + 'seller_id.txt'
-        f = open(file_path, 'r', encoding='utf-8')
-        for seller in f:
-            if seller_id == seller.strip():
-                logger.info('seller' + ' ' + seller_id + ' ' + 'is done')
-                return True
-        f.close()
-        return False
-        logger.info('seller' + ' ' + seller_id + ' ' + 'is not done yet')
+        try:
+            current_path = os.getcwd()
+            file_path = current_path + '\\' + 'seller_id.txt'
+            f = open(file_path, 'r', encoding='utf-8')
+            for seller in f:
+                if seller_id == seller.strip():
+                    logger.info('seller' + ' ' + seller_id + ' ' + 'is done')
+                    return True
+            f.close()
+            logger.info('seller' + ' ' + seller_id + ' ' + 'is not done yet')
+            return False
+        except Exception as e:
+            print(e)
 
     def add_seller_id(self, seller_id):
         try:
             logger.info('begin to add seller id')
             current_path = os.getcwd()
-            file_path = current_path + 'seller_id.txt'
+            file_path = current_path + '\\' + 'seller_id.txt'
             f = open(file_path, 'a', encoding='utf-8')
             f.write(seller_id + '\n')
             f.close()
