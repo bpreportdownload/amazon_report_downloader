@@ -160,11 +160,16 @@ class Download(object):
                 logger.info("brand: " + brand)
                 logger.info("ratings: " + rating)
                 logger.info("star: " + star_rating)
-                today = datetime.date.today()
+                today = datetime.date.today().strftime("%Y-%m-%d")
                 url = "{seller_profit_domain}/product/update-info".format(seller_profit_domain=seller_profit_domain)
+                sales_ranks_url = "{seller_profit_domain}/product/update-sales-rank".format(seller_profit_domain=seller_profit_domain)
                 params = {"asin": ASIN, "sales_ranks": rank, "brand": brand, "small_image": wrap_image, "weight": shipping_weight}
+                sales_ranks_params = {"asin": ASIN, "sales_ranks": rank, "date": today, "rating": rating}
 
                 res = requests.post(url=url, data=params)
+                logger.info(res)
+
+                res = requests.post(url=sales_ranks_url, data=sales_ranks_params)
                 logger.info(res)
                 time.sleep(random.randint(5, 10))
 
