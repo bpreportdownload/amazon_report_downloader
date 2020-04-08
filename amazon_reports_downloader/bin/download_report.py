@@ -51,7 +51,6 @@ def download_report(report):
                 except Exception as e:
                     downloader.save_page(e)
             continue
-            downloader.close_webdriver()
 
         if report == 'listing_info' or (int(time.strftime("%H", time.localtime())) > 22) or (int(time.strftime("%H", time.localtime())) < 3):
             downloader = Download(driver)
