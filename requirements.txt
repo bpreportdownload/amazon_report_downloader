@@ -6,3 +6,5 @@ PyPyDispatcher
 sentry-sdk
 apscheduler
 bs4
+lxml
+

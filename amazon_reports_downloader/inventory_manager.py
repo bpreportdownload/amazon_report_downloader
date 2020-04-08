@@ -366,7 +366,7 @@ class Download(object):
                                 res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
 
                                 logger.info(res.text)
-                            logger.info(date_flag)
+                            logger.info('date out of range: ' + date_flag)
 
                             if not date_flag:
                                 try:
@@ -384,7 +384,7 @@ class Download(object):
                 except Exception as e:
                     self.save_page(traceback.format_exc())
                     print(e)
-
+            self.driver.quit()
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
