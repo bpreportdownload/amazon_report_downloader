@@ -179,8 +179,6 @@ class Download(object):
 
     def review_info_scrapy(self, marketplace, seller_id, seller_profit_domain, record_file):
         try:
-            if self.check_seller(seller_id):
-                return
             self.driver.get(
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
@@ -314,16 +312,16 @@ class Download(object):
 
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
-                                # try:
-                                #     if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
-                                #         self.driver.close()
-                                #         handles = self.driver.window_handles
-                                #         self.driver.switch_to_window(handles[0])
-                                #         date_flag = True
-                                #         break
-                                # except Exception as e:
-                                #     logger.info("date error")
-                                #     print(e)
+                                try:
+                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 7:
+                                        self.driver.close()
+                                        handles = self.driver.window_handles
+                                        self.driver.switch_to_window(handles[0])
+                                        date_flag = True
+                                        break
+                                except Exception as e:
+                                    logger.info("date error")
+                                    print(e)
 
                                 review_text = review.find(attrs={'data-hook': 'review-body'}).text
                                 try:
@@ -384,8 +382,7 @@ class Download(object):
                 except Exception as e:
                     self.save_page(traceback.format_exc())
                     print(e)
-            # self.driver.close()
-            self.add_seller_id(seller_id)
+
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
@@ -1663,28 +1660,4 @@ class Download(object):
         return False
         logger.info('asin' + ' ' + asin + ' ' + 'is not done yet')
 
-    def check_seller(self, seller_id):
-        current_path = os.getcwd()
-        file_path = current_path + 'seller_id.txt'
-        f = open(file_path, 'r', encoding='utf-8')
-        for seller in f:
-            if seller_id == seller.strip():
-                logger.info('seller' + ' ' + seller_id + ' ' + 'is done')
-                return True
-        f.close()
-        return False
-        logger.info('seller' + ' ' + seller_id + ' ' + 'is not done yet')
-
-    def add_seller_id(self, seller_id):
-        try:
-            logger.info('begin to add seller id')
-            current_path = os.getcwd()
-            file_path = current_path + 'seller_id.txt'
-            f = open(file_path, 'a', encoding='utf-8')
-            f.write(seller_id + '\n')
-            f.close()
-            logger.info('seller id' + ' ' + seller_id + ' ' + 'save done')
-            time.sleep(random.randint(5, 10))
-        except Exception as e:
-            print(e)
 

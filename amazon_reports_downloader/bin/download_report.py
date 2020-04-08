@@ -41,7 +41,7 @@ def download_report(report):
         domain = 'com'
         if marketplace == 'ca':
             domain = 'ca'
-        if report == 'review_info':
+        if report == 'review_info' or (int(time.strftime("%H", time.localtime())) > 22) or (int(time.strftime("%H", time.localtime())) < 3):
 
             for seller_id in config['account']['seller_ids']:
 
@@ -53,7 +53,7 @@ def download_report(report):
             continue
             downloader.close_webdriver()
 
-        if report == 'listing_info':
+        if report == 'listing_info' or (int(time.strftime("%H", time.localtime())) > 22) or (int(time.strftime("%H", time.localtime())) < 3):
             downloader = Download(driver)
             logger.info(seller_id)
             try:
