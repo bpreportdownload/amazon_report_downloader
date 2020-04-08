@@ -384,6 +384,7 @@ class Download(object):
                 except Exception as e:
                     self.save_page(traceback.format_exc())
                     print(e)
+            self.clear_asin()
             self.driver.quit()
         except Exception as e:
             self.save_page(traceback.format_exc())
