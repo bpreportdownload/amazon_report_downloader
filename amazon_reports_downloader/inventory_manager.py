@@ -183,7 +183,14 @@ class Download(object):
                 "https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             time.sleep(random.randint(1, 4))
-            items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
+            try:
+                items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[1]/div/span[4]/div[1]/div")
+                if len(items) == 0:
+                    items = self.driver.find_elements_by_xpath(
+                        "//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
+            except Exception as e:
+                print(e)
+
             ASINs = []
             for item in items[0:-1]:
                 ASINs.append(item.get_attribute('data-asin'))
@@ -315,7 +322,7 @@ class Download(object):
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
                                 try:
-                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 7:
+                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
                                         self.driver.close()
                                         handles = self.driver.window_handles
                                         self.driver.switch_to_window(handles[0])
@@ -366,7 +373,8 @@ class Download(object):
                                 res = requests.post('{seller_profit_domain}/review/info'.format(seller_profit_domain=seller_profit_domain), data=data)
 
                                 logger.info(res.text)
-                            logger.info('date out of range: ' + date_flag)
+                            logger.info('date out of range: ')
+                            logger.info(date_flag)
 
                             if not date_flag:
                                 try:
@@ -385,7 +393,7 @@ class Download(object):
                     self.save_page(traceback.format_exc())
                     print(e)
             self.clear_asin()
-            self.driver.quit()
+            # self.driver.close()
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)

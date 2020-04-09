@@ -36,23 +36,27 @@ def download_report(report):
         gideon_password = config['account']['gideon_password']
         seller_id = config['account']['seller_id']
         seller_profit_domain = config['account']['domain']
-        driver = get_shared_driver(marketplace)
-        downloader = Download(driver)
+
         domain = 'com'
         if marketplace == 'ca':
             domain = 'ca'
-        if report == 'review_info' or (int(time.strftime("%H", time.localtime())) > 22) or (int(time.strftime("%H", time.localtime())) < 3):
+        if report == 'review_info':
 
             for seller_id in config['account']['seller_ids']:
 
                 logger.info(seller_id)
+
                 try:
+                    driver = get_shared_driver(marketplace)
+                    downloader = Download(driver)
                     downloader.review_info_scrapy(domain, seller_id, seller_profit_domain)
                 except Exception as e:
                     downloader.save_page(e)
+            downloader.close_webdriver()
             continue
 
-        if report == 'listing_info' or (int(time.strftime("%H", time.localtime())) > 22) or (int(time.strftime("%H", time.localtime())) < 3):
+        if report == 'listing_info':
+            driver = get_shared_driver(marketplace)
             downloader = Download(driver)
             logger.info(seller_id)
             try:
@@ -61,6 +65,7 @@ def download_report(report):
             except Exception as e:
                 downloader.save_page(e)
             continue
+        driver = get_shared_driver(marketplace)
         helper = SellerLoginHelper(driver, email, password, marketplace)
         downloader = Download(driver)
 
