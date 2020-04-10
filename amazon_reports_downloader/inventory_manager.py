@@ -7,7 +7,7 @@ import requests
 import calendar
 import traceback
 from bs4 import BeautifulSoup
-
+import pytz
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -247,7 +247,7 @@ class Download(object):
                         self.driver.switch_to.window(self.driver.window_handles[0])
                         continue
                     date_flag = False
-                    today = datetime.date.today()
+                    today = datetime.datetime.utcnow().date()
 
                     self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
                     self.driver.find_element_by_id('sort-order-dropdown_1').click()
@@ -322,7 +322,7 @@ class Download(object):
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
                                 try:
-                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                    if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
                                         self.add_asin(ASIN)
                                         self.driver.close()
                                         handles = self.driver.window_handles
@@ -579,7 +579,7 @@ class Download(object):
 
             from_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
-            today = datetime.date.today().strftime("%m/%d/%Y")
+            today = datetime.datetime.utcnow().date().strftime("%m/%d/%Y")
             time.sleep(random.randint(1, 7))
             for i in range(0, 30):
                 from_elem.send_keys('\b')
@@ -860,13 +860,13 @@ class Download(object):
             start = WebDriverWait(self.driver, 940, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            seven_days_ago = (datetime.date.today() - datetime.timedelta(days=random.randint(7, 10))).strftime("%m/%d/%Y")
+            seven_days_ago = (datetime.datetime.utcnow().date() - datetime.timedelta(days=random.randint(7, 10))).strftime("%m/%d/%Y")
             start.send_keys(seven_days_ago)
             time.sleep(random.randint(3, 7))
             end = WebDriverWait(self.driver, 940, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            yesterday = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
             end.send_keys(yesterday)
 
             logger.info('select date')
