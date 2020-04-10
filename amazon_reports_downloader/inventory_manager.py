@@ -201,14 +201,14 @@ class Download(object):
 
             for ASIN in ASINs:
                 try:
-                    logger.info(ASIN)
+                    logger.info('current asin is: ' + ASIN)
                     try:
                         if self.check_asin(ASIN):
                             return
                     except Exception as e:
                         print(e)
                     window_handles = self.driver.window_handles
-                    logger.info(len(window_handles))
+                    logger.info('current window handles number is: ' + str(len(window_handles)))
                     if len(window_handles) > 2:
                         for i in range(2, window_handles):
                             self.driver.switch_to.window(self.driver.window_handles[i])
@@ -322,7 +322,8 @@ class Download(object):
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
                                 try:
-                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 4:
+                                    if (datetime.date.today() - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                        self.add_asin(ASIN)
                                         self.driver.close()
                                         handles = self.driver.window_handles
                                         self.driver.switch_to_window(handles[0])
@@ -541,7 +542,7 @@ class Download(object):
             # click all orders
 
             WebDriverWait(self.driver, 20, 0.5).until(
-                EC.presence_of_element_located((By.ID, 'FlatFileAllOrdersReport'))).click()
+                EC.presence_of_element_located((By.ID, 'XmlAllOrdersReport'))).click()
 
             logger.info('click all orders')
             time.sleep(random.randint(1, 7))
@@ -614,7 +615,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
-            orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+            orders_name = re.findall(r"GET_XML_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
 
@@ -658,7 +659,7 @@ class Download(object):
 
             # click all orders
 
-            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'FlatFileAllOrdersReport'))).click()
+            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'XmlAllOrdersReport'))).click()
 
             logger.info('click all orders')
             time.sleep(random.randint(1, 7))
@@ -709,7 +710,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
-            orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+            orders_name = re.findall(r"GET_XML_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
         except Exception as e:
@@ -1681,6 +1682,7 @@ class Download(object):
             f = open(file_path, 'r+', encoding='utf-8')
             f.truncate()
             f.close()
+            self.add_asin('asin')
             logger.info('clear asins')
             return False
         except Exception as e:
