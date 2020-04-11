@@ -541,8 +541,15 @@ class Download(object):
 
             # click all orders
 
-            WebDriverWait(self.driver, 20, 0.5).until(
-                EC.presence_of_element_located((By.ID, 'XmlAllOrdersReport'))).click()
+            try:
+                WebDriverWait(self.driver, 20, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[3]/li[10]/a'))).click()
+                time.sleep(random.randint(1, 7))
+            except Exception as e:
+                print(e)
+
+            js_click_all_orders = "document.querySelector('#FlatFileAllOrdersReport > a').click();"
+            self.driver.execute_script(js_click_all_orders)
 
             logger.info('click all orders')
             time.sleep(random.randint(1, 7))
@@ -615,7 +622,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
-            orders_name = re.findall(r"GET_XML_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+            orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
 
@@ -658,8 +665,15 @@ class Download(object):
                     print(e)
 
             # click all orders
+            try:
+                WebDriverWait(self.driver, 20, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="sc-sidepanel"]/div/ul[3]/li[10]/a'))).click()
+                time.sleep(random.randint(1, 7))
+            except Exception as e:
+                print(e)
 
-            WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'XmlAllOrdersReport'))).click()
+            js_click_all_orders = "document.querySelector('#FlatFileAllOrdersReport > a').click();"
+            self.driver.execute_script(js_click_all_orders)
 
             logger.info('click all orders')
             time.sleep(random.randint(1, 7))
@@ -710,7 +724,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
-            orders_name = re.findall(r"GET_XML_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+            orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
         except Exception as e:
