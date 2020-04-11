@@ -586,7 +586,7 @@ class Download(object):
 
             from_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
-            today = datetime.datetime.utcnow().date().strftime("%m/%d/%Y")
+            today = datetime.datetime.today().strftime("%m/%d/%Y")
             time.sleep(random.randint(1, 7))
             for i in range(0, 30):
                 from_elem.send_keys('\b')
