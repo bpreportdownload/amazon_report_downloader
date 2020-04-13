@@ -2,12 +2,11 @@ import time
 import random
 import re
 import os
-import datetime
 import requests
 import calendar
 import traceback
 from bs4 import BeautifulSoup
-import pytz
+from datetime import datetime, timedelta, timezone
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -247,7 +246,7 @@ class Download(object):
                         self.driver.switch_to.window(self.driver.window_handles[0])
                         continue
                     date_flag = False
-                    today = datetime.datetime.utcnow().date()
+                    today = datetime.utcnow().date()
 
                     self.driver.find_element_by_xpath('//*[@id="a-autoid-4-announce"]').click()
                     self.driver.find_element_by_id('sort-order-dropdown_1').click()
@@ -482,9 +481,9 @@ class Download(object):
                 except Exception as e:
                     print(e)
                     self.driver.quit()
-            logger.info('All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt")
+            logger.info('All+Listings+Report+' + datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt")
             time.sleep(random.randint(20, 50))
-            return 'All+Listings+Report+' + datetime.datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt"
+            return 'All+Listings+Report+' + datetime.utcnow().date().strftime("%m-%d-%Y") + ".txt"
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
@@ -586,7 +585,8 @@ class Download(object):
 
             from_elem = WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#fromDateDownload')))
-            today = datetime.datetime.today().strftime("%m/%d/%Y")
+            # today = datetime.datetime.today().strftime("%m/%d/%Y")
+            today = datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=-7))).strftime("%m/%d/%Y")
             time.sleep(random.randint(1, 7))
             for i in range(0, 30):
                 from_elem.send_keys('\b')
@@ -874,13 +874,13 @@ class Download(object):
             start = WebDriverWait(self.driver, 940, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrFromDate')))
             start.click()
-            seven_days_ago = (datetime.datetime.utcnow().date() - datetime.timedelta(days=random.randint(7, 10))).strftime("%m/%d/%Y")
+            seven_days_ago = (datetime.utcnow().date() - timedelta(days=random.randint(7, 10))).strftime("%m/%d/%Y")
             start.send_keys(seven_days_ago)
             time.sleep(random.randint(3, 7))
             end = WebDriverWait(self.driver, 940, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#drrToDate')))
             end.click()
-            yesterday = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%m/%d/%Y")
+            yesterday = (datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=-7))) - timedelta(days=1)).strftime("%m/%d/%Y")
             end.send_keys(yesterday)
 
             logger.info('select date')
@@ -1514,7 +1514,7 @@ class Download(object):
                 logger.info("select report date")
                 date_elem = WebDriverWait(self.driver, 7).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['campaigns_date'])))
-                date_elem.value = (datetime.datetime.utcnow().date() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+                date_elem.value = (datetime.utcnow().date() - timedelta(days=1)).strftime("%Y-%m-%d")
                 logger.info(date_elem.value)
                 time.sleep(5)
                 logger.info("file_upload")
@@ -1606,7 +1606,7 @@ class Download(object):
                 logger.info("select report date")
                 date_elem = WebDriverWait(self.driver, 7).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, self.selectors['business_date'])))
-                date_elem.value = datetime.datetime.utcnow().date().strftime("%Y-%m-%d")
+                date_elem.value = datetime.utcnow().date().strftime("%Y-%m-%d")
 
                 logger.info("select country")
                 country_elem = WebDriverWait(self.driver, 7).until(
