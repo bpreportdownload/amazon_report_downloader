@@ -524,7 +524,7 @@ class Download(object):
                         report_name = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
                         logger.info(report_name)
-                        if report_name.startswith('Fulfillment'):
+                        if report_name.startswith('Fulfil'):
                             time.sleep(random.randint(3, 7))
                             js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                                 i)
@@ -650,7 +650,7 @@ class Download(object):
                     for i in range(1, length):
                         logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                         report_name = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name.startswith('Fulfillment'):
+                        if report_name.startswith('Fulfil'):
                             time.sleep(random.randint(3, 7))
                             js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(i)
                             self.driver.execute_script(js_click_fulfillments)
@@ -754,7 +754,7 @@ class Download(object):
                         logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                         report_name = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name.startswith('Fulfillment'):
+                        if report_name.startswith('Fulfil'):
                             time.sleep(random.randint(7, 9))
                             js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                                 i)
@@ -935,7 +935,7 @@ class Download(object):
                         logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
                         report_name = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name.startswith('Fulfillment'):
+                        if report_name.startswith('Fulfil'):
                             time.sleep(random.randint(3, 7))
                             js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
                                 i)
