@@ -42,7 +42,7 @@ ENV/
 *.xml
 
 inventory_download.yml
-
+inventory.yml
 .pytest*
 
 *.log
