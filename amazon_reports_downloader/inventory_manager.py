@@ -149,7 +149,7 @@ class Download(object):
                 except Exception as e:
                     print(e)
                     logger.info('can not find this item ' + sku)
-                    return
+
                 try:
                     length = len(self.driver.find_elements_by_xpath('//*[@id="a-popover-1"]/div/div/ul/li'))
                     logger.info('The length of the list is ' + str(length))
