@@ -80,17 +80,19 @@ class Download(object):
         logger.info("start: " + str(start))
         logger.info("shipment_number: " + str(shipment_number))
         logger.info("shipment_name: " + shipment_name)
+        first_window = self.driver.current_window_handle
         for index in range(start, shipment_number):
-            logger.info(index)
+            logger.info("index: " + str(index))
             if index > 0:
-                self.driver.execute_script("window.open('');")
+                self.driver.execute_script("window.open(" + '""' + ", " + str(index) + ");")
                 # Switch to the new window
-                self.driver.switch_to.window(self.driver.window_handles[index])
+                self.driver.switch_to.window(str(index))
                 self.driver.get("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
                     marketplace=marketplace))
                 logger.info("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
                     marketplace=marketplace))
                 time.sleep(random.randint(4, 7))
+
             try:
                 # 移动鼠标到inventory
                 for i in range(0, 3):
@@ -180,14 +182,16 @@ class Download(object):
                         self.driver.execute_script(js_click_send)
                     except Exception as e:
                         print(e)
-                time.sleep(random.randint(1, 5))
+                time.sleep(random.randint(5, 7))
                 try:
                     WebDriverWait(self.driver, 40, 0.5).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR,
-                                                        '#fba-core-page > div.fba-core-page-meta-landing-page.fba-core-page-meta-container > div.action > span:nth-child(2) > button')))
-                    js_click_send = "document.querySelector('#fba-core-page > div.fba-core-page-meta-landing-page.fba-core-page-meta-container > div.action > span:nth-child(2) > button').click();"
-                    self.driver.execute_script(js_click_send)
-                    time.sleep(random.randint(3, 7))
+                                                        '#save-manifest')))
+                    continue_ele = self.driver.find_element_by_css_selector("#save-manifest")
+                    if continue_ele.is_enabled():
+                        js_click_send = "document.querySelector('#save-manifest').click();"
+                        self.driver.execute_script(js_click_send)
+                        time.sleep(random.randint(3, 7))
                 except Exception as e:
                     print(e)
                     try:
@@ -505,7 +509,7 @@ class Download(object):
 
             except Exception as e:
                 print(e)
-        self.driver.switch_to.window(self.driver.window_handles[0])
+        self.driver.switch_to_window(first_window)
         js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').click();"
         self.driver.execute_script(js_click_continue)
         logger.info('confirm')
@@ -537,10 +541,12 @@ class Download(object):
         except Exception as e:
             print(e)
         for index in range(shipment_number - 1, start - 1, -1):
-            if index > 0:
-                try:
+            try:
+
+                if index > 0:
+                    self.driver.switch_to.window(str(index))
                     # Switch to the new window
-                    self.driver.switch_to.window(self.driver.window_handles[index])
+
                     self.driver.refresh()
                     time.sleep(random.randint(1, 3))
                     WebDriverWait(self.driver, 40, 0.5).until(
@@ -570,18 +576,20 @@ class Download(object):
                     js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').click();"
                     self.driver.execute_script(js_click_continue)
                     time.sleep(random.randint(2, 4))
-
                     self.driver.close()
-                except Exception as e:
-                    print(e)
-            else:
-                try:
+                else:
+                    self.driver.switch_to_window(first_window)
+                    WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        '#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(6) > button')))
+
                     js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(6) > button').click();"
                     self.driver.execute_script(js_click_continue)
                     time.sleep(random.randint(1, 3))
                     self.driver.close()
-                except Exception as e:
-                    print(e)
+            except Exception as e:
+                print(e)
+
 
     def listing_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
         try:

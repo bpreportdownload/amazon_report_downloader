@@ -23,7 +23,6 @@ def download_report(report):
 
     cl = YamlConfigLoader(config_path)
     config = cl.load()
-    logger.info(config['account']['marketplace'])
 
     if report == "add_inventory":
         inventory_path = './amazon_reports_downloader/inventory.yml'
@@ -38,7 +37,7 @@ def download_report(report):
         password = config['account']['password']
         seller_id = config['account']['seller_id']
         logger.info("parse config")
-        for marketplace in inventory_config['account']['marketplace']:
+        for marketplace in inventory_config['account']['marketplaces']:
             logger.info(marketplace)
             try:
                 if marketplace == 'us':
