@@ -84,9 +84,9 @@ class Download(object):
         for index in range(start, shipment_number):
             logger.info("index: " + str(index))
             if index > 0:
-                self.driver.execute_script("window.open(" + '""' + ", " + str(index) + ");")
+                self.driver.execute_script("window.open();")
                 # Switch to the new window
-                self.driver.switch_to.window(str(index))
+                self.driver.switch_to.window(self.driver.window_handles[index])
                 self.driver.get("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
                     marketplace=marketplace))
                 logger.info("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
@@ -544,7 +544,7 @@ class Download(object):
             try:
 
                 if index > 0:
-                    self.driver.switch_to.window(str(index))
+                    self.driver.switch_to.window(self.driver.window_handles[index])
                     # Switch to the new window
 
                     self.driver.refresh()
