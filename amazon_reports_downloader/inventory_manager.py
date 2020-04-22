@@ -7,7 +7,7 @@ import calendar
 import traceback
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
-
+from json import dumps
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -73,6 +73,513 @@ class Download(object):
             'FBA_inventory_report': '',
             'business_report': '',
         }
+
+    def add_inventory(self, marketplace, seller_id, sku, units, package_l, package_w, package_h, package_weight, shipment_name, shipment_number, shipment_id, start):
+        time.sleep(random.randint(4, 7))
+        logger.info("shipment_id: " + shipment_id)
+        logger.info("start: " + str(start))
+        logger.info("shipment_number: " + str(shipment_number))
+        logger.info("shipment_name: " + shipment_name)
+        for index in range(start, shipment_number):
+            logger.info(index)
+            if index > 0:
+                self.driver.execute_script("window.open('');")
+                # Switch to the new window
+                self.driver.switch_to.window(self.driver.window_handles[index])
+                self.driver.get("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
+                    marketplace=marketplace))
+                logger.info("https://sellercentral.amazon.{marketplace}/gp/homepage.html/ref=xx_home_logo_xx".format(
+                    marketplace=marketplace))
+                time.sleep(random.randint(4, 7))
+            try:
+                # 移动鼠标到inventory
+                for i in range(0, 3):
+                    click = 'false'
+                    try:
+                        inventory = WebDriverWait(self.driver, 40, 0.5).until(
+                            EC.presence_of_element_located((By.ID, 'sc-navtab-inventory')))
+                        time.sleep(random.randint(4, 7))
+                        webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
+                        logger.info('go to inventory')
+
+                        # click inventory reports
+
+                        length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
+                        logger.info(length)
+                        for i in range(1, length):
+                            report_name = self.driver.find_element_by_xpath(
+                                '//*[@id="sc-navtab-inventory"]/ul/li[{}]'.format(i)).text.strip()
+                            if report_name.startswith('Manage Inventory'):
+                                time.sleep(random.randint(7, 9))
+                                js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child({}) > a').click();".format(
+                                    i)
+                                self.driver.execute_script(js_click_inventory_reports)
+                                logger.info('click Manage Inventory')
+                                time.sleep(random.randint(1, 5))
+                                click = 'true'
+                                break
+                        if click == 'true':
+                            break
+                    except Exception as e:
+                        print(e)
+                sku_search_input = self.driver.find_element_by_id('myitable-search')
+                sku_search_input.send_keys(sku)
+                time.sleep(random.randint(1, 3))
+                js_click_search = "document.querySelector('#myitable-search-button > span > input').click();"
+                self.driver.execute_script(js_click_search)
+                logger.info('try to find this item ' + sku)
+                time.sleep(random.randint(1, 4))
+                try:
+                    dropdown = WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button')))
+                    webdriver.ActionChains(self.driver).move_to_element(dropdown).perform()
+                    time.sleep(random.randint(1, 4))
+                    logger.info('go to dropdown')
+
+                    try:
+                        js_click_dropdown = "document.querySelector('#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button').click();"
+                        self.driver.execute_script(js_click_dropdown)
+
+                    except Exception as e:
+                        print(e)
+                        try:
+                            self.driver.find_element_by_css_selector(
+                                '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button').click()
+
+                        except Exception as e:
+                            print(e)
+                    time.sleep(random.randint(1, 5))
+                except Exception as e:
+                    print(e)
+                    logger.info('can not find this item ' + sku)
+                    return
+
+                length = len(self.driver.find_elements_by_xpath('//*[@id="a-popover-1"]/div/div/ul/li'))
+                logger.info('The length of the list is ' + str(length))
+                js_click_flag = False
+                for i in range(1, length):
+                    dropdown_name = self.driver.find_element_by_xpath(
+                        '//*[@id="a-popover-1"]/div/div/ul/li[{}]'.format(i)).text.strip()
+                    logger.info(dropdown_name + ' ' + str(i))
+                    if dropdown_name.startswith('Send'):
+                        logger.info(dropdown_name + ' ' + str(i))
+                        time.sleep(random.randint(1, 5))
+                        try:
+                            js_click_send = "document.querySelector('#a-popover-1 > div > div > ul > li:nth-child({}) > a').click();".format(i)
+                            self.driver.execute_script(js_click_send)
+                            js_click_flag = True
+                        except Exception as e:
+                            print(e)
+
+                        logger.info('click Send/Replenish Inventory')
+                        time.sleep(random.randint(3, 7))
+                        break
+                if not js_click_flag:
+                    try:
+                        js_click_send = "document.querySelector('#dropdown1_5').click();".format(i)
+                        self.driver.execute_script(js_click_send)
+                    except Exception as e:
+                        print(e)
+                time.sleep(random.randint(1, 5))
+                try:
+                    WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        '#fba-core-page > div.fba-core-page-meta-landing-page.fba-core-page-meta-container > div.action > span:nth-child(2) > button')))
+                    js_click_send = "document.querySelector('#fba-core-page > div.fba-core-page-meta-landing-page.fba-core-page-meta-container > div.action > span:nth-child(2) > button').click();"
+                    self.driver.execute_script(js_click_send)
+                    time.sleep(random.randint(3, 7))
+                except Exception as e:
+                    print(e)
+                    try:
+                        self.driver.find_element_by_css_selector(
+                            '#fba-core-page > div.fba-core-page-meta-landing-page.fba-core-page-meta-container > div.action > span:nth-child(2) > button').click()
+                    except Exception as e:
+                        print(e)
+                logger.info('config Send')
+                try:
+                    limit = self.driver.find_element_by_css_selector('#plan-items > tr:nth-child(2) > td.item-errors.info > p.fba-core-alert-label.fba-core-alert-label-error').text.strip()
+                    if limit == "Limited restock":
+                        logger.info('Limited restock')
+                        break
+                except Exception as e:
+                    print(e)
+
+                try:
+
+                    logger.info('length')
+                    length_ele = self.driver.find_element_by_css_selector(
+                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(1)')
+                    length_ele.clear()
+                    length_ele.send_keys(package_l)
+                    logger.info('w')
+                    wide_ele = self.driver.find_element_by_css_selector(
+                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(2)')
+
+                    wide_ele.clear()
+                    wide_ele.send_keys(package_w)
+                    logger.info('h')
+                    height_ele = self.driver.find_element_by_css_selector(
+                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(3)')
+
+                    height_ele.clear()
+                    height_ele.send_keys(package_h)
+
+                    logger.info('weight')
+                    weight_ele = self.driver.find_element_by_css_selector('#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > input')
+
+                    js_click_weight = "document.querySelector('#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > select').value = 'G';"
+                    self.driver.execute_script(js_click_weight)
+                    weight_ele.send_keys(package_weight)
+
+                    WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        '#save-item-catalog-attributes')))
+
+                    logger.info('begin to save')
+                    js_click_save = "document.querySelector('#save-item-catalog-attributes').click();"
+                    self.driver.execute_script(js_click_save)
+                    logger.info('save done')
+                    time.sleep(random.randint(4, 7))
+
+                except Exception as e:
+                    print(e)
+                    print("do not need to add dimension")
+                self.driver.find_element_by_css_selector(
+                    '#batch-update-number-cases').send_keys(
+                    units)
+                WebDriverWait(self.driver, 40, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                    '#continue-plan')))
+                js_click_continue = "document.querySelector('#continue-plan').click();".format(
+                    i)
+                self.driver.execute_script(js_click_continue)
+
+                time.sleep(random.randint(4, 7))
+                try:
+                    logger.info('click choose category')
+                    WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        '#prep-items > tr:nth-child(2) > td.prep-category > a')))
+                    js_click_choose_category = "document.querySelector('#prep-items > tr:nth-child(2) > td.prep-category > a').click();"
+                    self.driver.execute_script(js_click_choose_category)
+
+                    logger.info('choose last one')
+
+                    js_click_choose_no = "document.querySelector('#prep-categories').value = 'NONE';"
+                    self.driver.execute_script(js_click_choose_no)
+                    time.sleep(random.randint(1, 4))
+
+                    logger.info('click choose')
+                    js_click_choose = "document.querySelector('#choose-category-button').click();"
+                    self.driver.execute_script(js_click_choose)
+                    time.sleep(random.randint(4, 7))
+                except Exception as e:
+                    print(e)
+
+                try:
+                    logger.info('click continue')
+                    js_click_continue = "document.querySelector('#continue-plan').click();"
+
+                    self.driver.execute_script(js_click_continue)
+                    time.sleep(random.randint(4, 7))
+                except Exception as e:
+                    print(e)
+
+                for i in range(5):
+                    try:
+                        element = self.driver.find_element_by_css_selector("#continue-plan")
+                        logger.info(element.is_enabled())
+                        if element.is_enabled():
+                            logger.info('click continue agin')
+                            js_click_continue = "document.querySelector('#continue-plan').click();"
+                            self.driver.execute_script(js_click_continue)
+                            time.sleep(random.randint(2, 5))
+
+                        if not element.is_enabled() and i < 2:
+                            logger.info('continue is disabled')
+                            js_click_all_products = "document.querySelector('#fba-core-tabs > li:nth-child(2) > a').click();"
+                            self.driver.execute_script(js_click_all_products)
+                            time.sleep(random.randint(2, 5))
+                            logger.info('click products needs info')
+                            try:
+
+                                logger.info('length')
+                                length_ele = self.driver.find_element_by_css_selector(
+                                    '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(1)')
+                                length_ele.clear()
+                                length_ele.send_keys(package_l)
+                                logger.info('w')
+                                wide_ele = self.driver.find_element_by_css_selector(
+                                    '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(2)')
+
+                                wide_ele.clear()
+                                wide_ele.send_keys(package_w)
+                                logger.info('h')
+                                height_ele = self.driver.find_element_by_css_selector(
+                                    '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(3)')
+
+                                height_ele.clear()
+                                height_ele.send_keys(package_h)
+
+                                logger.info('weight')
+                                weight_ele = self.driver.find_element_by_css_selector(
+                                    '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > input')
+
+                                js_click_weight = "document.querySelector('#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > select').value = 'G';"
+                                self.driver.execute_script(js_click_weight)
+                                weight_ele.send_keys(package_weight)
+
+                                time.sleep(random.randint(1, 4))
+
+                                logger.info('begin to save')
+                                js_click_save = "document.querySelector('#save-item-catalog-attributes').click();"
+                                self.driver.execute_script(js_click_save)
+                                logger.info('save done')
+                                time.sleep(random.randint(4, 7))
+
+                            except Exception as e:
+                                print(e)
+                                print("do not need to add dimension")
+                            tot_ele = self.driver.find_element_by_css_selector(
+                                '#batch-update-number-cases')
+                            tot_ele.clear()
+                            tot_ele.send_keys(
+                                units)
+
+                            num_ele = self.driver.find_element_by_css_selector(
+                                "#plan-items > tr:nth-child(2) > td.number.indi-pack > input")
+                            num_ele.clear()
+                            num_ele.send_keys(
+                                units)
+                            logger.info('send value')
+                            time.sleep(random.randint(4, 7))
+                            logger.info('click continue agin')
+                            js_click_continue = "document.querySelector('#continue-plan').click();"
+                            self.driver.execute_script(js_click_continue)
+                            time.sleep(random.randint(4, 7))
+                        try:
+                            element = self.driver.find_element_by_css_selector("#continue-plan")
+                            logger.info(element.is_enabled())
+                            if not element.is_enabled() and i > 1:
+                                logger.info('continue is disabled')
+                                js_click_all_products = "document.querySelector('#fba-core-tabs > li:nth-child(1) > a').click();"
+                                self.driver.execute_script(js_click_all_products)
+                                time.sleep(random.randint(4, 7))
+                                logger.info('click all products')
+                                try:
+
+                                    logger.info('length')
+                                    length_ele = self.driver.find_element_by_css_selector(
+                                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(1)')
+                                    length_ele.clear()
+                                    length_ele.send_keys(package_l)
+                                    logger.info('w')
+                                    wide_ele = self.driver.find_element_by_css_selector(
+                                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(2)')
+
+                                    wide_ele.clear()
+                                    wide_ele.send_keys(package_w)
+                                    logger.info('h')
+                                    height_ele = self.driver.find_element_by_css_selector(
+                                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > input:nth-child(3)')
+
+                                    height_ele.clear()
+                                    height_ele.send_keys(package_h)
+
+                                    logger.info('weight')
+                                    weight_ele = self.driver.find_element_by_css_selector(
+                                        '#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > input')
+
+                                    js_click_weight = "document.querySelector('#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(6) > form > select').value = 'G';"
+                                    self.driver.execute_script(js_click_weight)
+                                    weight_ele.send_keys(package_weight)
+
+                                    time.sleep(random.randint(4, 7))
+
+                                    logger.info('begin to save')
+                                    js_click_save = "document.querySelector('#save-item-catalog-attributes').click();"
+                                    self.driver.execute_script(js_click_save)
+                                    logger.info('save done')
+                                    time.sleep(random.randint(4, 7))
+
+                                except Exception as e:
+                                    print(e)
+                                    print("do not need to add dimension")
+                                tot_ele = self.driver.find_element_by_css_selector(
+                                    '#batch-update-number-cases')
+                                tot_ele.clear()
+                                tot_ele.send_keys(
+                                    units)
+
+                                num_ele = self.driver.find_element_by_css_selector(
+                                    "#plan-items > tr:nth-child(2) > td.number.indi-pack > input")
+                                num_ele.clear()
+                                num_ele.send_keys(
+                                    units)
+                                logger.info('send value')
+                                time.sleep(random.randint(4, 7))
+                                logger.info('click continue agin')
+                                js_click_continue = "document.querySelector('#continue-plan').click();"
+                                self.driver.execute_script(js_click_continue)
+                                time.sleep(random.randint(4, 7))
+                        except Exception as e:
+                            print(e)
+                    except Exception as e:
+                        print(e)
+                logger.info(index)
+                logger.info(shipment_id)
+                if index == 0:
+                    logger.info(shipment_name)
+                    elem = self.driver.find_element_by_css_selector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(1) > input.fba-core-input.fba-core-input-large.new-shipment-name.fba-core-input-text')
+                    elem.clear()
+                    elem.send_keys(shipment_name)
+                    time.sleep(random.randint(1, 5))
+
+                    # js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').click();"
+                    # self.driver.execute_script(js_click_continue)
+                    # logger.info('confirm')
+                    # time.sleep(random.randint(8, 12))
+                    # try:
+                    #     shipment_id = self.driver.find_element_by_css_selector("#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(2)").text.strip()
+                    #
+                    #     logger.info("css" + shipment_id)
+                    # except Exception as e:
+                    #     print(e)
+                    #
+                    # try:
+                    #     shipment_id = self.driver.find_element_by_xpath(
+                    #         "//*[@id='fba-core-workflow-shipment-summary-shipment']/tr[1]/td[2]").text.strip()
+                    #
+                    #     logger.info("xpath" + shipment_id)
+                    # except Exception as e:
+                    #     print(e)
+                    #
+                    # try:
+                    #     shipment_id = self.driver.find_element_by_xpath(
+                    #         "/html/body/div[2]/div[2]/div[2]/div/div[1]/div/div[1]/div/div/div[2]/div/div/table/tbody/tr[1]/td[2]").text.strip()
+                    #
+                    #     logger.info("full" + shipment_id)
+                    # except Exception as e:
+                    #     print(e)
+                else:
+                    pass
+                    # js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > input').click();"
+                    # self.driver.execute_script(js_click_continue)
+                    # time.sleep(random.randint(1, 5))
+                    # logger.info(shipment_id)
+                    # try:
+                    #     js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > select').value = " + shipment_id + ";"
+                    #     logger.info(js_click_continue)
+                    #
+                    #
+                    #     self.driver.execute_script(js_click_continue)
+                    # except Exception as e:
+                    #     print(e)
+                    #
+                    # try:
+                    #     js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > select').value = " + shipment_id
+                    #     logger.info(js_click_continue)
+                    #     logger.info("no")
+                    #     self.driver.execute_script(js_click_continue)
+                    # except Exception as e:
+                    #     print(e)
+                    # try:
+                    #     js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > select').value = " + dumps(shipment_id)
+                    #     logger.info(js_click_continue)
+                    #     logger.info("dumps")
+                    #
+                    #     self.driver.execute_script(js_click_continue)
+                    # except Exception as e:
+                    #     print(e)
+                    # time.sleep(random.randint(1, 5))
+                    #
+                    # js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').className = 'amznBtn btn-lg-pri-arrowr';"
+                    # self.driver.execute_script(js_click_continue)
+                    # time.sleep(random.randint(1, 5))
+                    #
+                    # js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').disabled = false;"
+                    # self.driver.execute_script(js_click_continue)
+                    # time.sleep(random.randint(1, 5))
+
+            except Exception as e:
+                print(e)
+        self.driver.switch_to.window(self.driver.window_handles[0])
+        js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').click();"
+        self.driver.execute_script(js_click_continue)
+        logger.info('confirm')
+        time.sleep(random.randint(3, 5))
+        WebDriverWait(self.driver, 40, 0.5).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR,
+                                            '#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(2)')))
+
+        try:
+            shipment_id = self.driver.find_element_by_css_selector("#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(2)").text.strip()
+
+            logger.info("css" + shipment_id)
+        except Exception as e:
+            print(e)
+
+        try:
+            shipment_id = self.driver.find_element_by_xpath(
+                "//*[@id='fba-core-workflow-shipment-summary-shipment']/tr[1]/td[2]").text.strip()
+
+            logger.info("xpath" + shipment_id)
+        except Exception as e:
+            print(e)
+
+        try:
+            shipment_id = self.driver.find_element_by_xpath(
+                "/html/body/div[2]/div[2]/div[2]/div/div[1]/div/div[1]/div/div/div[2]/div/div/table/tbody/tr[1]/td[2]").text.strip()
+
+            logger.info("full" + shipment_id)
+        except Exception as e:
+            print(e)
+        for index in range(shipment_number - 1, start - 1, -1):
+            if index > 0:
+                try:
+                    # Switch to the new window
+                    self.driver.switch_to.window(self.driver.window_handles[index])
+                    self.driver.refresh()
+                    time.sleep(random.randint(1, 3))
+                    WebDriverWait(self.driver, 40, 0.5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > input')))
+
+                    js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > input').click();"
+                    self.driver.execute_script(js_click_continue)
+                    time.sleep(random.randint(1, 5))
+                    logger.info(shipment_id)
+                    try:
+                        js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(1) > ul > li:nth-child(2) > select').value = " + dumps(
+                            shipment_id)
+                        logger.info(js_click_continue)
+                        logger.info("dumps")
+
+                        self.driver.execute_script(js_click_continue)
+                    except Exception as e:
+                        print(e)
+                    time.sleep(random.randint(1, 5))
+
+                    js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').className = 'amznBtn btn-lg-pri-arrowr';"
+                    self.driver.execute_script(js_click_continue)
+
+                    js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').disabled = false;"
+                    self.driver.execute_script(js_click_continue)
+
+                    js_click_continue = "document.querySelector('#fba-inbound-manifest-workflow-preview-edit-create-shipments').click();"
+                    self.driver.execute_script(js_click_continue)
+                    time.sleep(random.randint(2, 4))
+
+                    self.driver.close()
+                except Exception as e:
+                    print(e)
+            else:
+                try:
+                    js_click_continue = "document.querySelector('#fba-core-workflow-shipment-summary-shipment > tr:nth-child(1) > td:nth-child(6) > button').click();"
+                    self.driver.execute_script(js_click_continue)
+                    time.sleep(random.randint(1, 3))
+                    self.driver.close()
+                except Exception as e:
+                    print(e)
 
     def listing_info_scrapy(self, marketplace, seller_id, seller_profit_domain):
         try:

@@ -48,7 +48,6 @@ inventory_download.yml
 *.log
 *.ini
 !tox.ini
-*.yml
 !examples/configs/*.yml
 !requirements.txt
 !requirements-dev.txt
