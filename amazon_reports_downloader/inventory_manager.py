@@ -367,6 +367,8 @@ class Download(object):
                                 time.sleep(random.randint(4, 7))
                                 logger.info('click all products')
                                 try:
+                                    js_click_length = "document.querySelector('#plan-items > tr:nth-child(2) > td.item-errors.info > div:nth-child(3) > form > select').value = 'CM';"
+                                    self.driver.execute_script(js_click_length)
 
                                     logger.info('length')
                                     length_ele = self.driver.find_element_by_css_selector(

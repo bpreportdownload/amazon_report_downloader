@@ -7,4 +7,6 @@ sentry-sdk
 apscheduler
 bs4
 lxml
+json
+
 
