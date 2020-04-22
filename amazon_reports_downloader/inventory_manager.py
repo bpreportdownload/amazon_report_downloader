@@ -130,7 +130,7 @@ class Download(object):
                 js_click_search = "document.querySelector('#myitable-search-button > span > input').click();"
                 self.driver.execute_script(js_click_search)
                 logger.info('try to find this item ' + sku)
-                time.sleep(random.randint(1, 4))
+                time.sleep(random.randint(4, 7))
                 try:
                     dropdown = WebDriverWait(self.driver, 40, 0.5).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button')))
@@ -144,20 +144,24 @@ class Download(object):
 
                     except Exception as e:
                         print(e)
-                        try:
-                            self.driver.find_element_by_css_selector(
-                                '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button').click()
 
-                        except Exception as e:
-                            print(e)
-                    time.sleep(random.randint(1, 5))
+                    time.sleep(random.randint(2, 4))
                 except Exception as e:
                     print(e)
                     logger.info('can not find this item ' + sku)
                     return
-
-                length = len(self.driver.find_elements_by_xpath('//*[@id="a-popover-1"]/div/div/ul/li'))
-                logger.info('The length of the list is ' + str(length))
+                try:
+                    length = len(self.driver.find_elements_by_xpath('//*[@id="a-popover-1"]/div/div/ul/li'))
+                    logger.info('The length of the list is ' + str(length))
+                except Exception as e:
+                    print(e)
+                    try:
+                        self.driver.find_element_by_css_selector(
+                            '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button').click()
+                        time.sleep(random.randint(2, 4))
+                        length = len(self.driver.find_elements_by_xpath('//*[@id="a-popover-1"]/div/div/ul/li'))
+                    except Exception as e:
+                        print(e)
                 js_click_flag = False
                 for i in range(1, length):
                     dropdown_name = self.driver.find_element_by_xpath(
