@@ -133,13 +133,13 @@ class Download(object):
                 time.sleep(random.randint(4, 7))
                 try:
                     dropdown = WebDriverWait(self.driver, 40, 0.5).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, '#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button')))
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '#myitable table tr:last-child td:last-child .a-button-splitdropdown button')))
                     webdriver.ActionChains(self.driver).move_to_element(dropdown).perform()
                     time.sleep(random.randint(1, 4))
                     logger.info('go to dropdown')
 
                     try:
-                        js_click_dropdown = "document.querySelector('#myitable > div.mt-content.clearfix > div > table > tbody > tr.mt-row > td:nth-child(17) > div.mt-save-button-dropdown-normal > span > span > span.a-button.a-button-group-last.a-button-splitdropdown > span > button').click();"
+                        js_click_dropdown = "document.querySelector('#myitable table tr:last-child td:last-child .a-button-splitdropdown button').click();"
                         self.driver.execute_script(js_click_dropdown)
 
                     except Exception as e:
