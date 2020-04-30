@@ -612,6 +612,13 @@ class Download(object):
             self.driver.execute_script("window.open('');")
             for ASIN in ASINs:
                 logger.info(ASIN)
+                try:
+                    if not ASIN[0] == 'B':
+                        continue
+                except Exception as e:
+                    print(e)
+                    continue
+
                 record_flag = 0
                 time.sleep(random.randint(5, 10))
 
