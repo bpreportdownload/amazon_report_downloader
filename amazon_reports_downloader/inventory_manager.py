@@ -665,9 +665,16 @@ class Download(object):
                 shipping_weight_list = re.findall(r'Shipping Weight(.*?)\n', information)
                 logger.info(type(shipping_weight_list))
                 logger.info(shipping_weight_list)
-                shipping_weight_str = shipping_weight_list[0]
-                shipping_weight_num = shipping_weight_str.split(' ')[1]
-                shipping_weight_dim = shipping_weight_str.split(' ')[2]
+                shipping_weight_str = ''
+                shipping_weight_num = ''
+                shipping_weight_dim = ''
+                shipping_weight = ''
+                try:
+                    shipping_weight_str = shipping_weight_list[0]
+                    shipping_weight_num = shipping_weight_str.split(' ')[1]
+                    shipping_weight_dim = shipping_weight_str.split(' ')[2]
+                except Exception as e:
+                    print(e)
                 logger.info(shipping_weight_num)
                 logger.info(shipping_weight_dim)
                 if shipping_weight_dim == 'pounds':
@@ -856,17 +863,17 @@ class Download(object):
 
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
-                                # try:
-                                #     if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
-                                #         self.add_asin(ASIN)
-                                #         self.driver.close()
-                                #         handles = self.driver.window_handles
-                                #         self.driver.switch_to_window(handles[0])
-                                #         date_flag = True
-                                #         break
-                                # except Exception as e:
-                                #     logger.info("date error")
-                                #     print(e)
+                                try:
+                                    if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                        self.add_asin(ASIN)
+                                        self.driver.close()
+                                        handles = self.driver.window_handles
+                                        self.driver.switch_to_window(handles[0])
+                                        date_flag = True
+                                        break
+                                except Exception as e:
+                                    logger.info("date error")
+                                    print(e)
 
                                 review_text = review.find(attrs={'data-hook': 'review-body'}).text
                                 try:
