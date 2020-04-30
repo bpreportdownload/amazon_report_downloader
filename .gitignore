@@ -42,13 +42,12 @@ ENV/
 *.xml
 
 inventory_download.yml
-
+inventory.yml
 .pytest*
 
 *.log
 *.ini
 !tox.ini
-*.yml
 !examples/configs/*.yml
 !requirements.txt
 !requirements-dev.txt

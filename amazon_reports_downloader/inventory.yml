@@ -1,0 +1,24 @@
+account:
+  marketplaces: ['us']
+  us_market:
+    units: 48
+    package_l: 1
+    package_w: 1
+    package_h: 1
+    package_wight: 20
+    shipment_name: 04222020MissingTooth1000_2
+    skus: ['HV-8DSL-2FCS']
+    shipment_number: 24
+    shipment_id: ""
+    start: 0
+  ca_market:
+    units:
+    package_l:
+    package_w:
+    package_h:
+    package_wight:
+    shipment_name: 0421test
+    skus: ['']
+    shipment_number: 5
+    shipment_id: ''
+    start: 0
