@@ -80,7 +80,7 @@ class Download(object):
             self.driver.get("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             time.sleep(random.randint(4, 7))
-            items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
+            items = self.driver.find_elements_by_css_selector("#search div > span:nth-child(5) > div > div")
             ASINs = []
             for item in items[0:-1]:
                 ASINs.append(item.get_attribute('data-asin'))
@@ -204,7 +204,7 @@ class Download(object):
                     logger.info('current asin is: ' + ASIN)
                     try:
                         if self.check_asin(ASIN):
-                            return
+                            continue
                     except Exception as e:
                         print(e)
                     window_handles = self.driver.window_handles
@@ -321,17 +321,17 @@ class Download(object):
 
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
-                                try:
-                                    if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
-                                        self.add_asin(ASIN)
-                                        self.driver.close()
-                                        handles = self.driver.window_handles
-                                        self.driver.switch_to_window(handles[0])
-                                        date_flag = True
-                                        break
-                                except Exception as e:
-                                    logger.info("date error")
-                                    print(e)
+                                # try:
+                                #     if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                #         self.add_asin(ASIN)
+                                #         self.driver.close()
+                                #         handles = self.driver.window_handles
+                                #         self.driver.switch_to_window(handles[0])
+                                #         date_flag = True
+                                #         break
+                                # except Exception as e:
+                                #     logger.info("date error")
+                                #     print(e)
 
                                 review_text = review.find(attrs={'data-hook': 'review-body'}).text
                                 try:
@@ -393,7 +393,7 @@ class Download(object):
                 except Exception as e:
                     self.save_page(traceback.format_exc())
                     print(e)
-            self.clear_asin()
+            # self.clear_asin()
             # self.driver.close()
         except Exception as e:
             self.save_page(traceback.format_exc())
