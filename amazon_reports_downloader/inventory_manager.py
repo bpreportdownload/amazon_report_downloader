@@ -600,6 +600,7 @@ class Download(object):
             self.driver.get("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             time.sleep(random.randint(4, 7))
+
             items = self.driver.find_elements_by_css_selector("#search div > span:nth-child(5) > div > div")
             ASINs = []
             for item in items[0:-1]:
