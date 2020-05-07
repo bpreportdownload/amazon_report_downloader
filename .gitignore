@@ -43,6 +43,7 @@ ENV/
 
 inventory_download.yml
 inventory.yml
+asin.txt
 .pytest*
 
 *.log
