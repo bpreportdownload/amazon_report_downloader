@@ -1643,7 +1643,7 @@ class Download(object):
                 self.driver.execute_script(create_report)
 
             logger.info('click create report')
-            time.sleep(random.randint(10, 20))
+            time.sleep(random.randint(5, 20))
 
             # click download
             # 移动鼠标到reports
@@ -1678,6 +1678,7 @@ class Download(object):
                 except Exception as e:
                     print(e)
             if click == 'false':
+                logger.info("can not find report, try another way")
                 js_click_report = "document.querySelector('#topBar > div:nth-child(1) > div > nav > a:nth-child(1)').click();"
                 self.driver.execute_script(js_click_report)
             # click download reports
@@ -1686,6 +1687,7 @@ class Download(object):
                 report_status = self.driver.find_element_by_xpath('//*[@id="advertising-reports"]/div/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/div/div/p').text
                 logger.info(report_status)
                 if report_status == "Completed":
+                    logger.info("report is ready")
                     break
                 else:
                     self.driver.refresh()
