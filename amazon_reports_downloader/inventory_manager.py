@@ -1650,7 +1650,7 @@ class Download(object):
             for i in range(0, 3):
                 click = 'false'
                 try:
-                    reports = WebDriverWait(self.driver, 940, 0.5).until(
+                    reports = WebDriverWait(self.driver, 20, 0.5).until(
                         EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
@@ -1677,7 +1677,9 @@ class Download(object):
                         break
                 except Exception as e:
                     print(e)
-
+            if click == 'false':
+                js_click_report = "document.querySelector('#topBar > div:nth-child(1) > div > nav > a:nth-child(1)').click();"
+                self.driver.execute_script(js_click_report)
             # click download reports
 
             for i in range(30):
