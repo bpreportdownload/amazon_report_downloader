@@ -1635,9 +1635,12 @@ class Download(object):
             time.sleep(random.randint(4, 7))
 
             # click create report
-
-            create_report = "document.querySelector('#run-report-button').click()"
-            self.driver.execute_script(create_report)
+            try:
+                create_report = "document.querySelector('#run-report-button').click()"
+                self.driver.execute_script(create_report)
+            except Exception as e:
+                create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
+                self.driver.execute_script(create_report)
 
             logger.info('click create report')
             time.sleep(random.randint(10, 20))
