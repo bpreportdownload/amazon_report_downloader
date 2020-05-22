@@ -1642,7 +1642,17 @@ class Download(object):
                 self.driver.execute_script(create_report)
 
             logger.info('click create report')
-            time.sleep(random.randint(5, 20))
+            time.sleep(random.randint(5, 10))
+
+            # click run report
+            try:
+                run_report = "document.querySelector('#advertising-reports > div > div > div > div > div > div > div > button').click()"
+                self.driver.execute_script(run_report)
+            except Exception as e:
+                print(e)
+
+            logger.info('click run report')
+            time.sleep(random.randint(5, 10))
 
             # click download
             # 移动鼠标到reports
@@ -1682,7 +1692,7 @@ class Download(object):
                 self.driver.execute_script(js_click_report)
             # click download reports
 
-            for i in range(30):
+            for i in range(100):
                 report_status = self.driver.find_element_by_xpath('//*[@id="advertising-reports"]/div/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/div/div/p').text
                 logger.info(report_status)
                 if report_status == "Completed":
@@ -1690,8 +1700,8 @@ class Download(object):
                     break
                 else:
                     self.driver.refresh()
-                    time.sleep(random.randint(10, 15))
-            js_click_download = "document.querySelector('#advertising-reports > div > div > div > div.ReactTable > div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(2) > span > a').click();"
+                    time.sleep(random.randint(15, 20))
+            js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
             self.driver.execute_script(js_click_download)
             logger.info('click download')
             time.sleep(random.randint(4, 7))
