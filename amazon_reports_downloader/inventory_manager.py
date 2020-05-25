@@ -1581,24 +1581,33 @@ class Download(object):
                         break
                 except Exception as e:
                     print(e)
-            # choose Advertised product
 
-            # click drop down
+            # create report
+
+            logger.info("create report")
             try:
-                WebDriverWait(self.driver, 940, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH,
-                                                    '//*[@id="advertising-reports"]/div/div/div/div[1]/a/button')))
-                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.dzhatw > a').click()"
+                WebDriverWait(self.driver, 7, 0.5).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                    '#advertising-reports > div > div > div > div.sc-fzoCCn.lewZOv > a > button')))
+
+                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-fzoCCn.lewZOv > a > button').click()"
                 self.driver.execute_script(create_report)
             except Exception as e:
-                WebDriverWait(self.driver, 940, 0.5).until(
-                    EC.presence_of_element_located((By.XPATH,
-                                                    '//*[@id="advertising-reports"]/div/div/div/div[1]/a')))
-                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.iBsGPR > a').click()"
-                self.driver.execute_script(create_report)
+                try:
+                    WebDriverWait(self.driver, 7, 0.5).until(
+                        EC.presence_of_element_located((By.XPATH,
+                                                        '//*[@id="advertising-reports"]/div/div/div/div[1]/a/button')))
+                    create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.dzhatw > a').click()"
+                    self.driver.execute_script(create_report)
+                except Exception as e:
+                    WebDriverWait(self.driver, 7, 0.5).until(
+                        EC.presence_of_element_located((By.XPATH,
+                                                        '//*[@id="advertising-reports"]/div/div/div/div[1]/a')))
+                    create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-VigVT.iBsGPR > a').click()"
+                    self.driver.execute_script(create_report)
             time.sleep(random.randint(4, 7))
-            # advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-chPdSV.iiDyb > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
-            advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-chPdSV.hJxqxz > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
+            # advertised_product_drop_down = "document.querySelector('#cards-container > div.sc-qapaw.iJULWE > div > div.sc-fzppip.dsbAWo > table > tbody > tr:nth-child(2) > td > label > button').click()"
+            advertised_product_drop_down = "document.querySelector('#cards-container > div > div > div > table > tbody > tr:nth-child(2) > td > label > button > span').click()"
             self.driver.execute_script(advertised_product_drop_down)
             time.sleep(random.randint(4, 7))
             choose_advertised_product = "document.querySelector('#portal > div > div > button:nth-child(3)').click()"
@@ -1619,11 +1628,11 @@ class Download(object):
 
             # click drop down
 
-            report_period = "document.querySelector('#cards-container > div.sc-chPdSV.hJxqxz > div > div.sc-1xc1ftl-1.evvFrQ > table > tbody > tr:nth-child(4) > td > button').click()"
+            report_period = "document.querySelector('#cards-container > div > div > div > table > tbody > tr:nth-child(4) > td > button').click()"
             self.driver.execute_script(report_period)
             time.sleep(random.randint(4, 7))
 
-            js = "document.querySelector('#portal > div > div > div > div.sc-11mc28f-3.jWiMFK > button:nth-child(%s)').click();" % random.randint(1, 5)
+            js = "document.querySelector('#portal > div > div > div > div > button:nth-child(%s)').click();" % random.randint(1, 5)
             logger.info(js)
             self.driver.execute_script(js)
             logger.info('click drop down')
@@ -1638,8 +1647,15 @@ class Download(object):
                 create_report = "document.querySelector('#run-report-button').click()"
                 self.driver.execute_script(create_report)
             except Exception as e:
-                create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
-                self.driver.execute_script(create_report)
+                try:
+                    create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
+                    self.driver.execute_script(create_report)
+                except Exception as e:
+                    try:
+                        create_report = "document.querySelector('#advertising-reports > div > div > div > div > a > button').click()"
+                        self.driver.execute_script(create_report)
+                    except Exception as e:
+                        print(e)
 
             logger.info('click create report')
             time.sleep(random.randint(5, 10))
@@ -1701,7 +1717,8 @@ class Download(object):
                 else:
                     self.driver.refresh()
                     time.sleep(random.randint(15, 20))
-            js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
+            # js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
+            js_click_download = "document.querySelector('#advertising-reports > div > div > div > div.ReactTable > div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > a').click();"
             self.driver.execute_script(js_click_download)
             logger.info('click download')
             time.sleep(random.randint(4, 7))
