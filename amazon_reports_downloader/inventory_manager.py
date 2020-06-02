@@ -1518,6 +1518,13 @@ class Download(object):
             logger.info('click Manage FBA Inventory')
             time.sleep(random.randint(5, 9))
 
+            # check before report
+
+            download_button = WebDriverWait(self.driver, 940, 0.5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr/td[5]/a')))
+            download_link = download_button.get_attribute("href")
+            FBA_inventory_before = re.findall(r"_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA__(\d*)\.txt", download_link)[0]
+            logger.info(FBA_inventory_before)
 
             # click Request .txt Download
 
@@ -1528,19 +1535,22 @@ class Download(object):
             time.sleep(random.randint(20, 40))
 
             # click download
-
-            download_button = WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr/td[5]/a')))
+            while True:
+                download_button = WebDriverWait(self.driver, 940, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr/td[5]/a')))
+                download_link = download_button.get_attribute("href")
+                logger.info(download_link)
+                FBA_inventory = re.findall(r"_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA__(\d*)\.txt", download_link)[0]
+                if FBA_inventory != FBA_inventory_before:
+                    break
+            logger.info(FBA_inventory)
             download_button.click()
 
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
 
 
-            download_link = download_button.get_attribute("href")
-            logger.info(download_link)
-            FBA_inventory = re.findall(r"_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA__(\d*)\.txt", download_link)[0]
-            logger.info(FBA_inventory)
+
             return FBA_inventory + '.txt'
         except Exception as e:
             self.save_page(traceback.format_exc())
