@@ -1400,12 +1400,15 @@ class Download(object):
             # click data range report
             try:
                 WebDriverWait(self.driver, 10, 0.5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, '#PaymentTabs > div > ul > li:nth-child(4)'))).click()
+                    EC.presence_of_element_located((By.CSS_SELECTOR, '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child(4) > div > span.katal-tab-label > span')))
+                for k in range(3, 6):
+                    logger.info('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k))
+                    tab_name = self.driver.find_element_by_css_selector('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).text.strip()
+                    if tab_name == "Date Range Reports":
+                        self.driver.find_element_by_css_selector(
+                            '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).click()
             except Exception as e:
-                WebDriverWait(self.driver, 10, 0.5).until(
-                    EC.presence_of_element_located(
-                        (By.CSS_SELECTOR, '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child(5) > div > span.katal-tab-label > span'))).click()
-
+                print(e)
             logger.info('click data range report')
             time.sleep(random.randint(4, 7))
 
