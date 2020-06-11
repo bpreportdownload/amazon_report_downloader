@@ -1664,10 +1664,14 @@ class Download(object):
                 create_report = "document.querySelector('#run-report-button').click()"
                 self.driver.execute_script(create_report)
             except Exception as e:
+                print("error 1")
+                print(e)
                 try:
                     create_report = "document.querySelector('#sspa-reports\\:create-report-page\\:-create-report-button').click()"
                     self.driver.execute_script(create_report)
                 except Exception as e:
+                    print("error 2")
+                    print(e)
                     try:
                         create_report = "document.querySelector('#advertising-reports > div > div > div > div > a > button').click()"
                         self.driver.execute_script(create_report)
