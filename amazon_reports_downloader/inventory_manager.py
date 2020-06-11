@@ -1672,6 +1672,7 @@ class Download(object):
                 except Exception as e:
                     print("error 2")
                     print(e)
+                    time.sleep(1000)
                     try:
                         create_report = "document.querySelector('#advertising-reports > div > div > div > div > a > button').click()"
                         self.driver.execute_script(create_report)
