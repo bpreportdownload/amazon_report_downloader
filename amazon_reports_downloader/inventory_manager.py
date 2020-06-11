@@ -1665,7 +1665,7 @@ class Download(object):
                 self.driver.execute_script(create_report)
             except Exception as e:
                 try:
-                    create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
+                    create_report = "document.querySelector('#sspa-reports\\:create-report-page\\:-create-report-button').click()"
                     self.driver.execute_script(create_report)
                 except Exception as e:
                     try:
