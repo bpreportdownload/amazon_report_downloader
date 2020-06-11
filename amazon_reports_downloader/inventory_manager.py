@@ -1659,7 +1659,7 @@ class Download(object):
             logger.info('select date')
             time.sleep(random.randint(4, 7))
 
-            # click create report
+            # click run report
             try:
                 create_report = "document.querySelector('#run-report-button').click()"
                 self.driver.execute_script(create_report)
@@ -1674,59 +1674,59 @@ class Download(object):
                     except Exception as e:
                         print(e)
 
-            logger.info('click create report')
-            time.sleep(random.randint(5, 10))
-
-            # click run report
-            try:
-                run_report = "document.querySelector('#advertising-reports > div > div > div > div > div > div > div > button').click()"
-                self.driver.execute_script(run_report)
-            except Exception as e:
-                print(e)
-
             logger.info('click run report')
             time.sleep(random.randint(5, 10))
 
+            # click run report
+            # try:
+            #     run_report = "document.querySelector('#advertising-reports > div > div > div > div > div > div > div > button').click()"
+            #     self.driver.execute_script(run_report)
+            # except Exception as e:
+            #     print(e)
+            #
+            # logger.info('click run report')
+            # time.sleep(random.randint(5, 10))
+
             # click download
             # 移动鼠标到reports
-            for i in range(0, 3):
-                click = 'false'
-                try:
-                    reports = WebDriverWait(self.driver, 20, 0.5).until(
-                        EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
-                    time.sleep(random.randint(4, 7))
-                    webdriver.ActionChains(self.driver).move_to_element(reports).perform()
-                    logger.info('go to reports')
-
-                    # click advertising reports
-
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name == 'Advertising Reports':
-                            time.sleep(random.randint(5, 9))
-                            js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_advertising_reports)
-                            logger.info('click advertising reports')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
-                except Exception as e:
-                    print(e)
-            if click == 'false':
-                logger.info("can not find report, try another way")
-                js_click_report = "document.querySelector('#topBar > div:nth-child(1) > div > nav > a:nth-child(1)').click();"
-                self.driver.execute_script(js_click_report)
+            # for i in range(0, 3):
+            #     click = 'false'
+            #     try:
+            #         reports = WebDriverWait(self.driver, 20, 0.5).until(
+            #             EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+            #         time.sleep(random.randint(4, 7))
+            #         webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+            #         logger.info('go to reports')
+            #
+            #         # click advertising reports
+            #
+            #         length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+            #         logger.info(length)
+            #         for i in range(1, length):
+            #             logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+            #             report_name = self.driver.find_element_by_xpath(
+            #                 '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+            #             if report_name == 'Advertising Reports':
+            #                 time.sleep(random.randint(5, 9))
+            #                 js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+            #                     i)
+            #                 self.driver.execute_script(js_click_advertising_reports)
+            #                 logger.info('click advertising reports')
+            #                 time.sleep(random.randint(1, 7))
+            #                 click = 'true'
+            #                 break
+            #         if click == 'true':
+            #             break
+            #     except Exception as e:
+            #         print(e)
+            # if click == 'false':
+            #     logger.info("can not find report, try another way")
+            #     js_click_report = "document.querySelector('#topBar > div:nth-child(1) > div > nav > a:nth-child(1)').click();"
+            #     self.driver.execute_script(js_click_report)
             # click download reports
 
             for i in range(100):
-                report_status = self.driver.find_element_by_xpath('//*[@id="advertising-reports"]/div/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/div/div/p').text
+                report_status = self.driver.find_element_by_css_selector('#advertising-reports  div> div.ReactTable > div.rt-table > div.rt-tbody > div > div > div:nth-child(1) > div > p').text
                 logger.info(report_status)
                 if report_status == "Completed":
                     logger.info("report is ready")
@@ -1735,7 +1735,7 @@ class Download(object):
                     self.driver.refresh()
                     time.sleep(random.randint(15, 20))
             # js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
-            js_click_download = "document.querySelector('#advertising-reports > div > div > div > div.ReactTable > div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > a').click();"
+            js_click_download = "document.querySelector('#sspa-reports\\:report-settings-page\\:-download-button > span').click();"
             self.driver.execute_script(js_click_download)
             logger.info('click download')
             time.sleep(random.randint(4, 7))
