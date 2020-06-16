@@ -1682,7 +1682,7 @@ class Download(object):
                             self.driver.find_element_by_id("sspa-reports:create-report-page:-create-report-button").click()
                         except Exception as e:
                             print(e)
-                        time.sleep(1000)
+                            time.sleep(1000)
 
             logger.info('click run report')
             time.sleep(random.randint(5, 10))
