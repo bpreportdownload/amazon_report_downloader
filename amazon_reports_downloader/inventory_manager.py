@@ -1672,12 +1672,12 @@ class Download(object):
                 except Exception as e:
                     print("error 2")
                     print(e)
-                    time.sleep(1000)
                     try:
-                        create_report = "document.querySelector('#advertising-reports > div > div > div > div > a > button').click()"
+                        create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
                         self.driver.execute_script(create_report)
                     except Exception as e:
                         print(e)
+                        time.sleep(1000)
 
             logger.info('click run report')
             time.sleep(random.randint(5, 10))
@@ -1740,8 +1740,10 @@ class Download(object):
                     self.driver.refresh()
                     time.sleep(random.randint(15, 20))
             # js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
-            js_click_download = "document.querySelector('#sspa-reports\\:report-settings-page\\:-download-button > span').click();"
-            self.driver.execute_script(js_click_download)
+            # js_click_download = 'document.querySelector("a[id=\"sspa-reports:report-settings-page:-download-button\"] > span").click();'
+            # js_click_download = 'document.querySelector("a[id={}] > span").click();'.format('\"sspa-reports:report-settings-page:-download-button\"')
+            # self.driver.execute_script(js_click_download)
+            self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
             logger.info('click download')
             time.sleep(random.randint(4, 7))
 
