@@ -1751,12 +1751,14 @@ class Download(object):
             for i in range(10):
                 try:
                     self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
+                    break
                 except Exception as e:
                     print(e)
                     time.sleep(2)
                     try:
                         download_ele = self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button")
                         ActionChains(self.driver).context_click(download_ele).perform()
+                        break
                     except Exception as e:
                         print(e)
 
