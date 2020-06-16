@@ -1748,7 +1748,12 @@ class Download(object):
             # js_click_download = 'document.querySelector("a[id=\"sspa-reports:report-settings-page:-download-button\"] > span").click();'
             # js_click_download = 'document.querySelector("a[id={}] > span").click();'.format('\"sspa-reports:report-settings-page:-download-button\"')
             # self.driver.execute_script(js_click_download)
-            self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
+            for i in range(10):
+                try:
+                    self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
+                except Exception as e:
+                    print(e)
+                    time.sleep(2)
             logger.info('click download')
             time.sleep(random.randint(4, 7))
 
