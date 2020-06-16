@@ -1664,19 +1664,24 @@ class Download(object):
                 create_report = "document.querySelector('#run-report-button').click()"
                 self.driver.execute_script(create_report)
             except Exception as e:
-                print("error 1")
+                print("step 1")
                 print(e)
                 try:
                     create_report = "document.querySelector('#sspa-reports\\:create-report-page\\:-create-report-button').click()"
                     self.driver.execute_script(create_report)
                 except Exception as e:
-                    print("error 2")
+                    print("step 2")
                     print(e)
                     try:
                         create_report = "document.querySelector('#J_Button_NORMAL_ENABLED').click()"
                         self.driver.execute_script(create_report)
                     except Exception as e:
+                        print("step 3")
                         print(e)
+                        try:
+                            self.driver.find_element_by_id("sspa-reports:create-report-page:-create-report-button").click()
+                        except Exception as e:
+                            print(e)
                         time.sleep(1000)
 
             logger.info('click run report')
