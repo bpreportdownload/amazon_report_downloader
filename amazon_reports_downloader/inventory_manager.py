@@ -1198,9 +1198,12 @@ class Download(object):
                     self.driver.execute_script(js_change_display)
                     self.driver.execute_script(js_change_opacity)
                     # click fulfillments
-
-                    self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
-                    break
+                    try:
+                        logger.info('click fulfillments')
+                        self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
