@@ -1193,7 +1193,10 @@ class Download(object):
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
-
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
                     # click fulfillments
 
                     self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
