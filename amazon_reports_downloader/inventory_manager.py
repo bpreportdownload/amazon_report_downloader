@@ -1200,7 +1200,8 @@ class Download(object):
                     # click fulfillments
                     try:
                         logger.info('click fulfillments')
-                        self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                        fulfillment_link = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').get_attribute('href')
+                        self.driver.get(fulfillment_link)
                         break
                     except Exception as e:
                         print(e)
