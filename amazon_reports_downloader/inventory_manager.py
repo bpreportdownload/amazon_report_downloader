@@ -1189,7 +1189,7 @@ class Download(object):
             for i in range(0, 3):
                 # click = 'false'
                 try:
-                    reports = WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
+                    reports = WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="sc-navtab-reports"]/a')))
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
