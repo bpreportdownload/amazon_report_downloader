@@ -961,22 +961,26 @@ class Download(object):
 
                     # click inventory reports
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-inventory"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name == 'Inventory Reports':
-                            time.sleep(random.randint(7, 9))
-                            js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_inventory_reports)
-                            logger.info('click inventory reports')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Inventory")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-inventory"]/ul/li[{}]'.format(i)).text.strip()
+                    #     if report_name == 'Inventory Reports':
+                    #         time.sleep(random.randint(7, 9))
+                    #         js_click_inventory_reports = "document.querySelector('#sc-navtab-inventory > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_inventory_reports)
+                    #         logger.info('click inventory reports')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
                 except Exception as e:
                     print(e)
 
@@ -1060,24 +1064,28 @@ class Download(object):
 
                     # click fulfillments
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        logger.info(report_name)
-                        if report_name.startswith('Fulfil'):
-                            time.sleep(random.randint(3, 7))
-                            js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_fulfillments)
-                            logger.info('click fulfillments')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     logger.info(report_name)
+                    #     if report_name.startswith('Fulfil'):
+                    #         time.sleep(random.randint(3, 7))
+                    #         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_fulfillments)
+                    #         logger.info('click fulfillments')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
                 except Exception as e:
                     print(e)
 
@@ -1179,7 +1187,7 @@ class Download(object):
         try:
             # 移动鼠标到reports
             for i in range(0, 3):
-                click = 'false'
+                # click = 'false'
                 try:
                     reports = WebDriverWait(self.driver, 20, 0.5).until(EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
                     time.sleep(random.randint(4, 7))
@@ -1188,22 +1196,25 @@ class Download(object):
 
                     # click fulfillments
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        logger.info(report_name)
-                        if report_name.startswith('Fulfil'):
-                            time.sleep(random.randint(3, 7))
-                            js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(i)
-                            self.driver.execute_script(js_click_fulfillments)
-                            logger.info('click fulfillments')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     logger.info(report_name)
+                    #     if report_name.startswith('Fulfil'):
+                    #         time.sleep(random.randint(3, 7))
+                    #         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(i)
+                    #         self.driver.execute_script(js_click_fulfillments)
+                    #         logger.info('click fulfillments')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
 
                 except Exception as e:
                     print(e)
@@ -1292,23 +1303,27 @@ class Download(object):
 
                     # click fulfillments
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name.startswith('Fulfil'):
-                            time.sleep(random.randint(7, 9))
-                            js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_fulfillments)
-                            logger.info('click fulfillments')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     if report_name.startswith('Fulfil'):
+                    #         time.sleep(random.randint(7, 9))
+                    #         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_fulfillments)
+                    #         logger.info('click fulfillments')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
                 except Exception as e:
                     print(e)
 
@@ -1375,23 +1390,27 @@ class Download(object):
 
                     # click payments
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name == 'Payments':
-                            time.sleep(random.randint(3, 7))
-                            js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_payments)
-                            logger.info('click payments')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Payments")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     if report_name == 'Payments':
+                    #         time.sleep(random.randint(3, 7))
+                    #         js_click_payments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_payments)
+                    #         logger.info('click payments')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
 
                 except Exception as e:
                     print(e)
@@ -1480,23 +1499,27 @@ class Download(object):
 
                     # click fulfillments
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name.startswith('Fulfil'):
-                            time.sleep(random.randint(3, 7))
-                            js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_fulfillments)
-                            logger.info('click fulfillments')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     if report_name.startswith('Fulfil'):
+                    #         time.sleep(random.randint(3, 7))
+                    #         js_click_fulfillments = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_fulfillments)
+                    #         logger.info('click fulfillments')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
                 except Exception as e:
                     print(e)
 
@@ -1579,23 +1602,27 @@ class Download(object):
 
                     # click advertising reports
 
-                    length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
-                    logger.info(length)
-                    for i in range(1, length):
-                        logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
-                        report_name = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
-                        if report_name == 'Advertising Reports':
-                            time.sleep(random.randint(5, 9))
-                            js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
-                                i)
-                            self.driver.execute_script(js_click_advertising_reports)
-                            logger.info('click advertising reports')
-                            time.sleep(random.randint(1, 7))
-                            click = 'true'
-                            break
-                    if click == 'true':
-                        break
+                    self.driver.find_element_by_xpath(
+                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Advertising")]').click()
+                    break
+
+                    # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
+                    # logger.info(length)
+                    # for i in range(1, length):
+                    #     logger.info(('//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)))
+                    #     report_name = self.driver.find_element_by_xpath(
+                    #         '//*[@id="sc-navtab-reports"]/ul/li[{}]'.format(i)).text.strip()
+                    #     if report_name == 'Advertising Reports':
+                    #         time.sleep(random.randint(5, 9))
+                    #         js_click_advertising_reports = "document.querySelector('#sc-navtab-reports > ul > li:nth-child({}) > a').click();".format(
+                    #             i)
+                    #         self.driver.execute_script(js_click_advertising_reports)
+                    #         logger.info('click advertising reports')
+                    #         time.sleep(random.randint(1, 7))
+                    #         click = 'true'
+                    #         break
+                    # if click == 'true':
+                    #     break
                 except Exception as e:
                     print(e)
 

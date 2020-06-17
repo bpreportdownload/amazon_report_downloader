@@ -194,7 +194,9 @@ def download_report(report):
             except Exception as e:
                 downloader.save_page(e)
             continue
+
         driver = get_shared_driver(marketplace)
+        time.sleep(15)
         helper = SellerLoginHelper(driver, email, password, marketplace)
         downloader = Download(driver)
 
