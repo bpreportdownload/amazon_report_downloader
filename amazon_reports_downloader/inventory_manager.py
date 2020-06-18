@@ -1188,6 +1188,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
+            self.driver.get(download_link)
             orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
