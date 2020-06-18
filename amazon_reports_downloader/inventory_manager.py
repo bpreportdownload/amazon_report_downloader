@@ -956,14 +956,22 @@ class Download(object):
                         EC.presence_of_element_located((By.ID, 'sc-navtab-inventory')))
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(inventory).perform()
+
                     logger.info('go to inventory')
-
-
-                    # click inventory reports
-
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Inventory")]').click()
-                    break
+                    js_change_display = 'document.querySelector("#sc-navtab-inventory > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-inventory > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
+                    # click Inventory
+                    try:
+                        logger.info('click Inventory')
+                        inventory_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Inventory")]').get_attribute(
+                            'href')
+                        self.driver.get(inventory_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-inventory"]/ul/li'))
                     # logger.info(length)
@@ -1061,12 +1069,19 @@ class Download(object):
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
-
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
                     # click fulfillments
-
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
-                    break
+                    try:
+                        logger.info('click fulfillments')
+                        fulfillment_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').get_attribute('href')
+                        self.driver.get(fulfillment_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
@@ -1308,12 +1323,19 @@ class Download(object):
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
-
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
                     # click fulfillments
-
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
-                    break
+                    try:
+                        logger.info('click fulfillments')
+                        fulfillment_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').get_attribute('href')
+                        self.driver.get(fulfillment_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
@@ -1394,13 +1416,23 @@ class Download(object):
                         EC.presence_of_element_located((By.ID, 'sc-navtab-reports')))
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
+
                     logger.info('go to reports')
-
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
                     # click payments
+                    try:
+                        logger.info('click Advertising')
+                        fulfillment_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Payments")]').get_attribute(
+                            'href')
+                        self.driver.get(fulfillment_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Payments")]').click()
-                    break
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
@@ -1504,12 +1536,19 @@ class Download(object):
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
-
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
                     # click fulfillments
-
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').click()
-                    break
+                    try:
+                        logger.info('click fulfillments')
+                        fulfillment_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Fulfil")]').get_attribute('href')
+                        self.driver.get(fulfillment_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
@@ -1607,12 +1646,19 @@ class Download(object):
                     time.sleep(random.randint(4, 7))
                     webdriver.ActionChains(self.driver).move_to_element(reports).perform()
                     logger.info('go to reports')
-
-                    # click advertising reports
-
-                    self.driver.find_element_by_xpath(
-                        '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Advertising")]').click()
-                    break
+                    js_change_display = 'document.querySelector("#sc-navtab-reports > ul").style.display = "block";'
+                    js_change_opacity = 'document.querySelector("#sc-navtab-reports > ul").style.opacity = 1;'
+                    self.driver.execute_script(js_change_display)
+                    self.driver.execute_script(js_change_opacity)
+                    # click Advertising
+                    try:
+                        logger.info('click Advertising')
+                        fulfillment_link = self.driver.find_element_by_xpath(
+                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Advertising")]').get_attribute('href')
+                        self.driver.get(fulfillment_link)
+                        break
+                    except Exception as e:
+                        print(e)
 
                     # length = len(self.driver.find_elements_by_xpath('//*[@id="sc-navtab-reports"]/ul/li'))
                     # logger.info(length)
