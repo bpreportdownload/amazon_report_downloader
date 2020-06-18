@@ -1276,7 +1276,7 @@ class Download(object):
             logger.info('download request')
             time.sleep(random.randint(1, 7))
 
-            WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
+            # WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
             download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
@@ -1286,6 +1286,7 @@ class Download(object):
             download_link = download_button.get_attribute("href")
 
             logger.info(download_link)
+            self.driver.get(download_link)
             orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
