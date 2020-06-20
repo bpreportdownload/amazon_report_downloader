@@ -1460,13 +1460,13 @@ class Download(object):
             # click data range report
             try:
                 WebDriverWait(self.driver, 10, 0.5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child(4) > div > span.katal-tab-label > span')))
-                for k in range(3, 6):
-                    logger.info('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k))
-                    tab_name = self.driver.find_element_by_css_selector('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).text.strip()
-                    if tab_name == "Date Range Reports":
-                        self.driver.find_element_by_css_selector(
-                            '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).click()
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'kat-tab-header[tab-id="DATE_RANGE_REPORTS"]')))
+                # for k in range(3, 6):
+                #     logger.info('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k))
+                #     tab_name = self.driver.find_element_by_css_selector('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).text.strip()
+                #     if tab_name == "Date Range Reports":
+                script = 'document.querySelector("kat-tab-header[tab-id=DATE_RANGE_REPORTS]").click();'
+                self.driver.execute_script(script)
             except Exception as e:
                 print(e)
             logger.info('click data range report')
