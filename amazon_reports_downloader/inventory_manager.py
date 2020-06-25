@@ -1460,13 +1460,13 @@ class Download(object):
             # click data range report
             try:
                 WebDriverWait(self.driver, 10, 0.5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child(4) > div > span.katal-tab-label > span')))
-                for k in range(3, 6):
-                    logger.info('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k))
-                    tab_name = self.driver.find_element_by_css_selector('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).text.strip()
-                    if tab_name == "Date Range Reports":
-                        self.driver.find_element_by_css_selector(
-                            '#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).click()
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'kat-tab-header[tab-id="DATE_RANGE_REPORTS"]')))
+                # for k in range(3, 6):
+                #     logger.info('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k))
+                #     tab_name = self.driver.find_element_by_css_selector('#root > div > article > section kat-tab-pane > kat-tab-header:nth-child({}) > div > span.katal-tab-label > span'.format(k)).text.strip()
+                #     if tab_name == "Date Range Reports":
+                script = 'document.querySelector("kat-tab-header[tab-id=DATE_RANGE_REPORTS]").click();'
+                self.driver.execute_script(script)
             except Exception as e:
                 print(e)
             logger.info('click data range report')
@@ -1744,7 +1744,7 @@ class Download(object):
 
             # click run report
             try:
-                create_report = "document.querySelector('#run-report-button').click()"
+                create_report = "document.querySelector('#sticky-header button').click()"
                 self.driver.execute_script(create_report)
             except Exception as e:
                 print("step 1")
@@ -1826,29 +1826,29 @@ class Download(object):
                 else:
                     self.driver.refresh()
                     time.sleep(random.randint(15, 20))
-            # js_click_download = "document.querySelector('#advertising-reports div.rt-table > div.rt-tbody > div:nth-child(1) > div > div:nth-child(3) > span > a').click();"
+            js_click_download = "document.querySelector('.ReactTable .rt-tbody .rt-tr:first-child .rt-td:last-child a').click();"
             # js_click_download = 'document.querySelector("a[id=\"sspa-reports:report-settings-page:-download-button\"] > span").click();'
             # js_click_download = 'document.querySelector("a[id={}] > span").click();'.format('\"sspa-reports:report-settings-page:-download-button\"')
-            # self.driver.execute_script(js_click_download)
-            for i in range(10):
-                try:
-                    self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
-                    break
-                except Exception as e:
-                    print(e)
-                    time.sleep(2)
-                    try:
-                        download_ele = self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button")
-                        ActionChains(self.driver).context_click(download_ele).perform()
-                        break
-                    except Exception as e:
-                        print(e)
+            self.driver.execute_script(js_click_download)
+            # for i in range(10):
+            #     try:
+            #         self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button").click()
+            #         break
+            #     except Exception as e:
+            #         print(e)
+            #         time.sleep(2)
+            #         try:
+            #             download_ele = self.driver.find_element_by_id("sspa-reports:report-settings-page:-download-button")
+            #             ActionChains(self.driver).context_click(download_ele).perform()
+            #             break
+            #         except Exception as e:
+            #             print(e)
 
             logger.info('click download')
             time.sleep(random.randint(4, 7))
 
 
-            dir_list = os.listdir(os.path.expanduser('~/Downloads/'))
+            dir_list = list(filter(lambda x: x.endswith('.xlsx'), os.listdir(os.path.expanduser('~/Downloads/'))))
             dir_list = sorted(dir_list, key=lambda x: os.path.getmtime(os.path.join(os.path.expanduser('~/Downloads/'), x)))
             return dir_list[-1]
             # return 'Sponsored Products Search term report.xlsx'
@@ -1941,7 +1941,7 @@ class Download(object):
         logger.info('click download')
         time.sleep(random.randint(20, 30))
 
-        dir_list = os.listdir(os.path.expanduser('~/Downloads/'))
+        dir_list = list(filter(lambda x: x.endswith('.xlsx'), os.listdir(os.path.expanduser('~/Downloads/'))))
         dir_list = sorted(dir_list, key=lambda x: os.path.getmtime(os.path.join(os.path.expanduser('~/Downloads/'), x)))
         return dir_list[-1]
 
