@@ -1391,13 +1391,13 @@ class Download(object):
 
             download_button = WebDriverWait(self.driver, 900, 0.5).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[5]/a')))
-            download_button.click()
 
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
 
             download_link = download_button.get_attribute("href")
             logger.info(download_link)
+            self.driver.get(download_link)
             FBA_shippment_name = re.findall(r"GET_AMAZON_FULFILLED_SHIPMENTS_DATA__(\d*)\.txt", download_link)[0]
             logger.info(FBA_shippment_name)
             return FBA_shippment_name + '.txt'
@@ -1512,10 +1512,10 @@ class Download(object):
             download_button = WebDriverWait(self.driver, 900, 0.5).until(
                 EC.presence_of_element_located(
                     (By.XPATH, '//*[@id="downloadButton"]/span/a')))
-            download_button.click()
             logger.info('click download')
             time.sleep(random.randint(4, 7))
             download_link = download_button.get_attribute("href")
+            self.driver.get(download_link)
             bulk_report = re.findall(r"fileName=(.*)?\.csv", download_link)[0]
             logger.info(bulk_report)
             time.sleep(random.randint(10, 20))
@@ -1622,7 +1622,7 @@ class Download(object):
                 if FBA_inventory != FBA_inventory_before:
                     break
             logger.info(FBA_inventory)
-            download_button.click()
+            self.driver.get(download_link)
 
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
@@ -1684,12 +1684,13 @@ class Download(object):
             # create report
 
             logger.info("create report")
+
             try:
                 WebDriverWait(self.driver, 7, 0.5).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR,
-                                                    '#advertising-reports > div > div > div > div.sc-fzoCCn.lewZOv > a > button')))
+                                                    '#advertising-reports a')))
 
-                create_report = "document.querySelector('#advertising-reports > div > div > div > div.sc-fzoCCn.lewZOv > a > button').click()"
+                create_report = "document.querySelector('#advertising-reports a > button').click();"
                 self.driver.execute_script(create_report)
             except Exception as e:
                 try:
@@ -1749,8 +1750,7 @@ class Download(object):
                 print("step 1")
                 print(e)
                 try:
-                    create_report = "document.querySelector('#sspa-reports\\:create-report-page\\:-create-report-button').click()"
-                    self.driver.execute_script(create_report)
+                    self.driver.find_element_by_xpath('//*[@id="sspa-reports:create-report-page:-create-report-button"]').click()
                 except Exception as e:
                     print("step 2")
                     print(e)
