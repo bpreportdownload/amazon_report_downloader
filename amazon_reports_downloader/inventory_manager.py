@@ -1303,9 +1303,12 @@ class Download(object):
 
             logger.info(download_link)
             self.driver.get(download_link)
-            orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
-            logger.info(orders_name)
-            return orders_name + '.txt'
+            try:
+                orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+                logger.info(orders_name)
+                return orders_name + '.txt'
+            except Exception as e:
+                print(e)
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
