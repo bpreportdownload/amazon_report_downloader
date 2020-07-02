@@ -1172,14 +1172,12 @@ class Download(object):
             # click download
 
             WebDriverWait(self.driver, 120, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#requestDownload button')))
+            download_button = "document.querySelector('#requestDownload button').click();"
+            self.driver.execute_script(download_button)
 
             logger.info('download request')
-            time.sleep(random.randint(1, 7))
 
-            WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located(
-                (By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
-            logger.info('downloading')
             time.sleep(random.randint(10, 20))
             WebDriverWait(self.driver, 120, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadArchive table tbody tr:first-child a')))
@@ -1191,6 +1189,7 @@ class Download(object):
 
             logger.info(download_link)
             self.driver.get(download_link)
+            logger.info('downloading')
             orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
             logger.info(orders_name)
             return orders_name + '.txt'
@@ -1289,13 +1288,14 @@ class Download(object):
 
             # click download
 
-            WebDriverWait(self.driver, 120, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestDownload"]/td[2]/button'))).click()
-
+            WebDriverWait(self.driver, 120, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#requestDownload button')))
+            download_button = "document.querySelector('#requestDownload button').click();"
+            self.driver.execute_script(download_button)
             logger.info('download request')
-            time.sleep(random.randint(1, 7))
 
             # WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
-            logger.info('downloading')
+
             time.sleep(random.randint(10, 20))
             WebDriverWait(self.driver, 120, 0.5).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadArchive table tbody tr:first-child a')))
@@ -1307,6 +1307,7 @@ class Download(object):
 
             logger.info(download_link)
             self.driver.get(download_link)
+            logger.info('downloading')
             try:
                 orders_name = re.findall(r"LAST_UPDATE__(\d*)\.txt", download_link)[0]
                 logger.info(orders_name)
