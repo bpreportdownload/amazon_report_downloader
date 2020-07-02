@@ -1368,38 +1368,36 @@ class Download(object):
                     print(e)
 
             # click Amazon Fulfilled Shipments
+            WebDriverWait(self.driver, 140, 0.5).until(EC.presence_of_element_located((By.ID, 'AFNShipmentReport')))
+            afs_button_click = "document.querySelector('#AFNShipmentReport').click();"
+            self.driver.execute_script(afs_button_click)
 
-            WebDriverWait(self.driver, 940, 0.5).until(EC.presence_of_element_located((By.ID, 'AFNShipmentReport'))).click()
 
             logger.info('click Amazon Fulfilled Shipments')
             time.sleep(random.randint(1, 7))
 
-            # click event date drop down
+            # click event date drop down choose date range
 
-            WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
-
-            logger.info('click event date drop down')
-            time.sleep(random.randint(1, 7))
-
-            # choose date range
-
-            WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadDateDropdown > option:nth-child({})'.format(random.randint(3, 5))))).click()
+            WebDriverWait(self.driver, 140, 0.5).until(EC.presence_of_element_located((By.ID, 'downloadDateDropdown')))
+            date_click = "document.querySelector('#downloadDateDropdown').value = {};".format(random.randint(3, 5))
+            logger.info(date_click)
+            self.driver.execute_script(date_click)
 
             logger.info('date range')
             time.sleep(random.randint(1, 7))
 
             # click  Request .txt Download
 
-            WebDriverWait(self.driver, 960, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
+            # WebDriverWait(self.driver, 960, 0.5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#requestCsvTsvDownload tr:nth-child(1) button')))
+            download_request_click = "javascript:FBAReporting.requestDownloadSubmitWithReportFileFormat('TSV');"
+            self.driver.execute_script(download_request_click)
 
             logger.info('click  Request .txt Download')
             time.sleep(random.randint(1, 7))
             # click download
 
             download_button = WebDriverWait(self.driver, 900, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[5]/a')))
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadArchive table tbody tr:first-child a')))
 
             logger.info('downloading')
             time.sleep(random.randint(20, 50))
@@ -1434,7 +1432,7 @@ class Download(object):
                     self.driver.execute_script(js_change_opacity)
                     # click payments
                     try:
-                        logger.info('click Advertising')
+                        logger.info('click Payments')
                         fulfillment_link = self.driver.find_element_by_xpath(
                             '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Payments")]').get_attribute(
                             'href')
@@ -1484,7 +1482,9 @@ class Download(object):
             # click generate report
 
             WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportButton'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportButton')))
+            script = 'document.querySelector("#drrGenerateReportButton").click();'
+            self.driver.execute_script(script)
 
             logger.info('click data range report')
             time.sleep(random.randint(4, 7))
@@ -1509,7 +1509,9 @@ class Download(object):
             # generate
 
             WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton'))).click()
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#drrGenerateReportsGenerateButton')))
+            script = 'document.querySelector("#drrGenerateReportsGenerateButton").click();'
+            self.driver.execute_script(script)
 
             logger.info('select date')
             time.sleep(random.randint(10, 20))
