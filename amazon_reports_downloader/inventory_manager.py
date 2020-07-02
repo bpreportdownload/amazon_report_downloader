@@ -1180,8 +1180,10 @@ class Download(object):
             WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located(
                 (By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
             logger.info('downloading')
-            time.sleep(random.randint(20, 50))
-            download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
+            time.sleep(random.randint(10, 20))
+            WebDriverWait(self.driver, 120, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadArchive table tbody tr:first-child a')))
+            download_button = self.driver.find_element_by_css_selector('#downloadArchive table tbody tr:first-child a')
             # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
             logger.info("download_button")
 
@@ -1294,8 +1296,10 @@ class Download(object):
 
             # WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a/span/span'))).click()
             logger.info('downloading')
-            time.sleep(random.randint(20, 50))
-            download_button = self.driver.find_element_by_xpath('//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')
+            time.sleep(random.randint(10, 20))
+            WebDriverWait(self.driver, 120, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '#downloadArchive table tbody tr:first-child a')))
+            download_button = self.driver.find_element_by_css_selector('#downloadArchive table tbody tr:first-child a')
             # download_button = WebDriverWait(self.driver, 40, 0.5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr[1]/td[4]/a')))
             logger.info("download_button")
 
@@ -1304,11 +1308,12 @@ class Download(object):
             logger.info(download_link)
             self.driver.get(download_link)
             try:
-                orders_name = re.findall(r"GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE__(\d*)\.txt", download_link)[0]
+                orders_name = re.findall(r"LAST_UPDATE__(\d*)\.txt", download_link)[0]
                 logger.info(orders_name)
                 return orders_name + '.txt'
             except Exception as e:
                 print(e)
+                time.sleep(100)
         except Exception as e:
             self.save_page(traceback.format_exc())
             print(e)
