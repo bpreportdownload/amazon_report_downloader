@@ -1377,11 +1377,15 @@ class Download(object):
             time.sleep(random.randint(1, 7))
 
             # click event date drop down choose date range
-
-            WebDriverWait(self.driver, 140, 0.5).until(EC.presence_of_element_located((By.ID, 'downloadDateDropdown')))
-            date_click = "document.querySelector('#downloadDateDropdown').value = {};".format(random.randint(3, 5))
-            logger.info(date_click)
-            self.driver.execute_script(date_click)
+            # time.sleep(random.randint(20, 40))
+            WebDriverWait(self.driver, 140, 0.5).until(EC.presence_of_element_located((By.ID, 'downloadDateDropdown'))).click()
+            pt = '#downloadDateDropdown > option:nth-child({})'.format(random.randint(3, 5))
+            logger.info(pt)
+            WebDriverWait(self.driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, pt))).click()
+            # date_click = "document.querySelector('#downloadDateDropdown').value = {}".format(random.randint(3, 5))
+            # logger.info(date_click)
+            # self.driver.execute_script(date_click)
 
             logger.info('date range')
             time.sleep(random.randint(1, 7))
