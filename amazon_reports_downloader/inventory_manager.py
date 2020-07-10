@@ -966,7 +966,7 @@ class Download(object):
                     try:
                         logger.info('click Inventory')
                         inventory_link = self.driver.find_element_by_xpath(
-                            '//*[@id="sc-navtab-reports"]/ul/li/a[contains(text(), "Inventory")]').get_attribute(
+                            '//*[@id="sc-navtab-inventory"]/ul/li/a[contains(text(), "Inventory Reports")]').get_attribute(
                             'href')
                         self.driver.get(inventory_link)
                         break
@@ -993,6 +993,7 @@ class Download(object):
                     print(e)
 
             # click Report Type drop down
+            time.sleep(100)
 
             WebDriverWait(self.driver, 40, 0.5).until(
                 EC.presence_of_element_located((By.ID, 'a-autoid-0-announce'))).click()
