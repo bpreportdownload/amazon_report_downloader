@@ -726,7 +726,7 @@ class Download(object):
             logger.info("https://www.amazon.{marketplace}/s?me={seller_id}&marketplaceID=ATVPDKIKX0DER".format(marketplace=marketplace, seller_id=seller_id))
             time.sleep(random.randint(1, 4))
             try:
-                items = self.driver.find_elements_by_xpath("//*[@id=\"search\"]/div[1]/div[1]/div/span[4]/div[1]/div")
+                items = self.driver.find_elements_by_css_selector("#search span:nth-child(4) > div:nth-child(2) > div")
                 if len(items) == 0:
                     items = self.driver.find_elements_by_xpath(
                         "//*[@id=\"search\"]/div[1]/div[2]/div/span[4]/div[1]/div")
@@ -734,9 +734,9 @@ class Download(object):
                 print(e)
 
             ASINs = []
-            for item in items[0:-1]:
-                ASINs.append(item.get_attribute('data-asin'))
-
+            # for item in items[0:-1]:
+            #     ASINs.append(item.get_attribute('data-asin'))
+            ASINs = ["B088W8TN9Y", "B08CDM2R6W", "B088LLB3ZC", "B08B3VBP1M", "B0888LQBDR", "B088D2NMTQ", "B0883FG9ZR", "B07FP3SLRY", "B07TVCF3B9", "B07X8NNCHH", "B083HJNZLN", "B0811Q9825", "B082Y2Y7FW", "B085DSH7MW"]
             logger.info(ASINs)
             listing_base = 'https://www.amazon.{marketplace}/dp/'.format(marketplace=marketplace)
             reviews_base = 'https://www.amazon.{marketplace}/product-reviews/'.format(marketplace=marketplace)
@@ -863,17 +863,17 @@ class Download(object):
 
                                 review_date = review_date_year + '-' + str(review_date_month) + '-' + review_date_day
                                 logger.info("review_date: " + review_date)
-                                try:
-                                    if (today - datetime.date(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
-                                        self.add_asin(ASIN)
-                                        self.driver.close()
-                                        handles = self.driver.window_handles
-                                        self.driver.switch_to_window(handles[0])
-                                        date_flag = True
-                                        break
-                                except Exception as e:
-                                    logger.info("date error")
-                                    print(e)
+                                # try:
+                                #     if (today - datetime.datetime(int(review_date_year), int(review_date_month), int(review_date_day))).days > 5:
+                                #         self.add_asin(ASIN)
+                                #         self.driver.close()
+                                #         handles = self.driver.window_handles
+                                #         self.driver.switch_to_window(handles[0])
+                                #         date_flag = True
+                                #         break
+                                # except Exception as e:
+                                #     logger.info("date error")
+                                #     print(e)
 
                                 review_text = review.find(attrs={'data-hook': 'review-body'}).text
                                 try:
