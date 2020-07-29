@@ -1609,11 +1609,8 @@ class Download(object):
 
             # click Manage FBA Inventory
 
-            reports = WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.ID, 'FBA_MYI_UNSUPPRESSED_INVENTORY')))
-            time.sleep(random.randint(4, 7))
-            webdriver.ActionChains(self.driver).move_to_element(reports).perform()
-            reports.click()
+            fba_inv_report_js = "document.querySelector('#FBA_MYI_UNSUPPRESSED_INVENTORY a').click();"
+            self.driver.execute_script(fba_inv_report_js)
             logger.info('click Manage FBA Inventory')
             time.sleep(random.randint(5, 9))
 
@@ -1626,9 +1623,9 @@ class Download(object):
             logger.info(FBA_inventory_before)
 
             # click Request .txt Download
-
-            WebDriverWait(self.driver, 940, 0.5).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
+            self.driver.execute_script("javascript:FBAReporting.requestDownloadSubmitWithReportFileFormat('TSV');")
+            # WebDriverWait(self.driver, 940, 0.5).until(
+            #     EC.presence_of_element_located((By.XPATH, '//*[@id="requestCsvTsvDownload"]/tr[1]/td[3]/button'))).click()
 
             logger.info('Request .txt Download')
             time.sleep(random.randint(20, 40))
