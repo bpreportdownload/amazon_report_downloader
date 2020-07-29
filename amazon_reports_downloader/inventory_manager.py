@@ -1595,8 +1595,8 @@ class Download(object):
 
             # click inventory show more
             try:
-                WebDriverWait(self.driver, 910, 0.5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, '#sc-sidepanel > div > ul:nth-child(3) > li.level3-header.show-more > a'))).click()
+                show_more_js = '''document.querySelector("li[class='level3-header show-more'] a").click()'''
+                self.driver.execute_script(show_more_js)
             except Exception as e:
                 print(e)
                 try:
