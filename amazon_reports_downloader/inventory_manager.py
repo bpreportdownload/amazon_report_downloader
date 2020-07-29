@@ -996,8 +996,10 @@ class Download(object):
             time.sleep(100)
 
             WebDriverWait(self.driver, 40, 0.5).until(
-                EC.presence_of_element_located((By.ID, 'a-autoid-0-announce'))).click()
+                EC.presence_of_element_located((By.ID, 'a-autoid-0-announce')))
 
+            drop_down_js = 'document.querySelector("#a-autoid-0-announce").click();'
+            self.driver.execute_script(drop_down_js)
             logger.info('click Report Type drop down')
             time.sleep(random.randint(4, 7))
 
