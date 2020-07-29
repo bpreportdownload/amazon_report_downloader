@@ -1035,7 +1035,8 @@ class Download(object):
                 try:
                     logger.info('%s-report_download' % id)
                     download_button = WebDriverWait(self.driver, 900, 0.5).until(EC.presence_of_element_located((By.ID, '%s-report_download' % id)))
-                    download_button.click()
+                    download_report_js = '''document.querySelector("td[data-row='%s'] a").click();''' % id
+                    self.driver.execute_script(download_report_js)
                     logger.info(download_button)
                     break
                 except Exception as e:
