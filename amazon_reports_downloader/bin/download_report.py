@@ -4,7 +4,7 @@ import sys
 import time
 import click
 import random
-
+import psutil
 from amazon_reports_downloader import logger, get_shared_driver, MARKETPLACE_MAPPING
 from amazon_reports_downloader.utils import YamlConfigLoader
 from amazon_reports_downloader.helpers import SellerLoginHelper
@@ -15,6 +15,9 @@ from amazon_reports_downloader.inventory_manager import Download
 
 def download_report(report):
     logger.info(report)
+    for i in range(100):
+        if webdriver_process_check("chromedriver.exe"):
+            time.sleep(10)
     config_path = './amazon_reports_downloader/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
@@ -352,8 +355,18 @@ def download_report(report):
             downloader.save_page()
             print(e)
 
+def webdriver_process_check(processName):
+    # print(processName)
+    pids = psutil.pids()
+    for pid in pids:
+        p = psutil.Process(pid)
+        if p.name() == processName:
+            print(processName)
+            return True
+    return False
 
 if __name__ == '__main__':
+
     download_report()
 
 

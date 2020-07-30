@@ -13,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+import psutil
 
 from selenium.webdriver.support.select import Select
 from selenium import webdriver
@@ -946,6 +947,8 @@ class Download(object):
     def scroll_down(self,):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+
+
     def go_to_listings_download_page(self):
         try:
             # 移动鼠标到inventory
@@ -1635,7 +1638,6 @@ class Download(object):
                 download_button = WebDriverWait(self.driver, 940, 0.5).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="downloadArchive"]/table/tbody/tr/td[5]/a')))
                 download_link = download_button.get_attribute("href")
-                logger.info(download_link)
                 FBA_inventory = re.findall(r"_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA__(\d*)\.txt", download_link)[0]
                 if FBA_inventory != FBA_inventory_before:
                     break
