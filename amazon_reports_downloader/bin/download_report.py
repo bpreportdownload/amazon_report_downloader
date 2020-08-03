@@ -241,7 +241,7 @@ def download_report(report):
             logger.info(marketplace)
             downloader.close_tooltips()
 
-            if report == "order_report_today":
+            if report == "order_report_today" or report == "all_reports":
                 index = random.randint(0, 7)
                 logger.info(index)
 
@@ -255,7 +255,7 @@ def download_report(report):
                         except Exception as e:
                             print(e)
                     else:
-                        if (int(time.strftime("%H", time.localtime())) > 18) or (int(time.strftime("%H", time.localtime())) < 8):
+                        if (int(time.strftime("%H", time.localtime())) > 18) or (int(time.strftime("%H", time.localtime())) < 8) or report == "all_reports":
                             if (i + index) % 7 == 1:
                                 try:
                                     file_name = downloader.go_to_orders_download_page()
