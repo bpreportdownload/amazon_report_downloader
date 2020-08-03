@@ -15,9 +15,12 @@ from amazon_reports_downloader.inventory_manager import Download
 
 def download_report(report):
     logger.info(report)
-    for i in range(100):
-        if webdriver_process_check("chromedriver.exe"):
-            time.sleep(10)
+    try:
+        for i in range(100):
+            if webdriver_process_check("chromedriver.exe"):
+                time.sleep(10)
+    except Exception as e:
+        print(e)
     config_path = './amazon_reports_downloader/inventory_download.yml'
     config_path = os.path.abspath(os.path.expanduser(config_path))
     if not os.path.isfile(config_path):
